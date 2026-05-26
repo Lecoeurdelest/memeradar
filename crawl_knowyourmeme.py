@@ -86,6 +86,14 @@ def title_from_page(soup: BeautifulSoup, fallback: str) -> str:
     return fallback
 
 
+def meta_description(soup: BeautifulSoup) -> str | None:
+    for selector in ('meta[name="description"]', 'meta[property="og:description"]'):
+        tag = soup.select_one(selector)
+        if tag and tag.get("content"):
+            return clean_text(tag["content"])
+    return None
+
+
 def fetch(session: requests.Session, url: str, sleep: float, retries: int = 3) -> requests.Response:
     last_error: Exception | None = None
     for attempt in range(1, retries + 1):
@@ -161,7 +169,7 @@ def scrape_entry(
     title = title_from_page(soup, entry["title"])
     slug = f"{index:03d}-{slugify(title)}"
 
-    about = section_text(soup, "About")
+    about = section_text(soup, "About") or section_text(soup, "Overview") or meta_description(soup)
     origin = section_text(soup, "Origin") or meta_value(soup, "Origin")
     image_url = image_url_from_page(soup)
     image_path = None
