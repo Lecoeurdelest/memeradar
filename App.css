@@ -1,0 +1,64 @@
+:root {
+  --bg: #0b0b10;
+  --fg: #f4f4f7;
+  --muted: #8a8a99;
+  --accent: #ff3d7f;
+  --card: #15151d;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: ui-sans-serif, system-ui; }
+
+.app { max-width: 1400px; margin: 0 auto; padding: 32px 24px; }
+
+header h1 { font-size: 48px; margin: 0; letter-spacing: -2px; }
+header h1 span { color: var(--accent); }
+header p { color: var(--muted); margin: 4px 0 24px; }
+
+.bar { display: flex; gap: 8px; margin-bottom: 12px; }
+.bar input {
+  flex: 1; padding: 16px 20px; font-size: 18px; border-radius: 12px;
+  border: 1px solid #25252f; background: #111118; color: var(--fg); outline: none;
+}
+.bar input:focus { border-color: var(--accent); }
+.bar button {
+  padding: 0 28px; border: 0; border-radius: 12px; font-weight: 700;
+  background: var(--accent); color: #fff; cursor: pointer; font-size: 16px;
+}
+
+.weights { display: flex; justify-content: center; margin-bottom: 24px; }
+.weights label { display: flex; gap: 12px; align-items: center; color: var(--muted); font-size: 14px; }
+.weights input[type="range"] { accent-color: var(--accent); width: 200px; }
+.weights b { color: var(--fg); min-width: 36px; display: inline-block; }
+
+.grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.card {
+  background: var(--card); border-radius: 12px; overflow: hidden; cursor: pointer;
+  transition: transform .15s; border: 1px solid #1f1f29;
+}
+.card:hover { transform: translateY(-3px); border-color: var(--accent); }
+.card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.card .meta {
+  display: flex; justify-content: space-between; padding: 8px 12px;
+  font-size: 12px; color: var(--muted);
+}
+.card .tpl { text-transform: lowercase; }
+.card .score { color: var(--accent); font-variant-numeric: tabular-nums; }
+
+.modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,.85);
+  display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 10;
+}
+.modal-inner {
+  display: flex; gap: 24px; max-width: 1000px; width: 100%;
+  background: var(--card); border-radius: 16px; padding: 24px;
+}
+.modal-inner img { max-width: 500px; max-height: 70vh; border-radius: 8px; }
+.modal-inner .info { flex: 1; }
+.modal-inner h3 { margin-top: 0; }
+.modal-inner .irony { color: var(--accent); font-style: italic; }
+.modal-inner .lineage { background: #1f1f29; padding: 12px; border-radius: 8px; font-size: 14px; }
+.modal-inner a { color: var(--accent); display: inline-block; margin-top: 12px; }
