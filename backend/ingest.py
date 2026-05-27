@@ -7,6 +7,18 @@ import sys
 from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
+RETRY_DELAYS = [5, 15, 30, 60]
+
+
+async def _with_retry(coro_fn):
+    for attempt, delay in enumerate(RETRY_DELAYS + [None]):
+        try:
+            return await coro_fn()
+        except Exception as e:
+            if "429" not in str(e) or delay is None:
+                raise
+            await asyncio.sleep(delay)
+
 from backend import config
 from backend.clients import (
     close_all,
@@ -42,12 +54,17 @@ async def ingest_one(
         ocr_text = await extract_text(image_path)
 
         try:
-            decoded, template_from_llm = await decode_meme(
-                title=entry["post_title"],
-                ocr_text=ocr_text,
-                subreddit=entry.get("source_subreddit", config.SUBREDDIT),
+            decoded, template_from_llm = await _with_retry(
+                lambda: decode_meme(
+                    title=entry["post_title"],
+                    ocr_text=ocr_text,
+                    subreddit=entry.get("source_subreddit", config.SUBREDDIT),
+                )
             )
         except DecodeError as e:
+            quarantine.append({"id": reddit_id, "reason": f"decode: {e}"})
+            return False
+        except Exception as e:
             quarantine.append({"id": reddit_id, "reason": f"decode: {e}"})
             return False
 
@@ -63,7 +80,7 @@ async def ingest_one(
             return False
 
         try:
-            irony_vec = await mistral_embed(decoded.search_dense_explanations)
+            irony_vec = await _with_retry(lambda: mistral_embed(decoded.search_dense_explanations))
         except Exception as e:
             quarantine.append({"id": reddit_id, "reason": f"mistral_embed: {e}"})
             return False
@@ -103,7 +120,7 @@ async def ingest_one(
         return True
 
 
-async def run(workers: int, limit: int | None) -> None:
+async def run(workers: int, limit: int | None, delay: float) -> None:
     manifest_path = config.DATA_DIR / "memes.json"
     if not manifest_path.exists():
         print(f"No manifest found at {manifest_path}")
@@ -113,28 +130,27 @@ async def run(workers: int, limit: int | None) -> None:
     if limit:
         entries = entries[:limit]
 
-    print(f"Starting ingest: {len(entries)} memes, {workers} workers")
+    print(f"Starting ingest: {len(entries)} memes, {workers} workers, {delay}s inter-item delay")
     await ensure_collection()
 
     semaphore = asyncio.Semaphore(workers)
     quarantine: list[dict] = []
+    ok = 0
 
-    tasks = [ingest_one(entry, semaphore, quarantine) for entry in entries]
-    results = await asyncio.gather(*tasks, return_exceptions=True)
-
-    ok = sum(1 for r in results if r is True)
-    errors = sum(1 for r in results if isinstance(r, Exception))
-
-    for i, r in enumerate(results):
-        if isinstance(r, Exception):
-            quarantine.append({"id": entries[i]["id"], "reason": str(r)})
+    for i, entry in enumerate(entries):
+        result = await ingest_one(entry, semaphore, quarantine)
+        if result is True:
+            ok += 1
+        print(f"[{i+1}/{len(entries)}] {entry['id']} -> {'ok' if result else 'quarantined'}")
+        if delay > 0 and i < len(entries) - 1:
+            await asyncio.sleep(delay)
 
     if quarantine:
         quarantine_path = config.DATA_DIR / "quarantine.json"
         quarantine_path.write_text(json.dumps(quarantine, indent=2))
         print(f"Quarantined {len(quarantine)} memes -> {quarantine_path}")
 
-    print(f"Ingest complete: {ok} ok, {len(quarantine)} quarantined, {errors} exceptions")
+    print(f"Ingest complete: {ok} ok, {len(quarantine)} quarantined")
 
     await close_all()
 
@@ -143,8 +159,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--delay", type=float, default=2.0)
     args = parser.parse_args()
-    asyncio.run(run(args.workers, args.limit))
+    asyncio.run(run(args.workers, args.limit, args.delay))
 
 
 if __name__ == "__main__":

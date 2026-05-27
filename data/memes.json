@@ -1,1 +1,1002 @@
-[]
+[
+  {
+    "id": "001-will-smith-tada-presenting",
+    "image_path": "data/knowyourmeme_latest/picture/001-will-smith-tada-presenting.jpg",
+    "post_title": "Will Smith Tada / Presenting",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/008/119/Will_Smith_Presenting_Meme_banner.jpg",
+    "permalink": "https://knowyourmeme.com/memes/will-smith-tada-presenting",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "will-smith-tada-presenting"
+  },
+  {
+    "id": "002-excuse-me-sir-billy-butcher-edits",
+    "image_path": "data/knowyourmeme_latest/picture/002-excuse-me-sir-billy-butcher-edits.jpg",
+    "post_title": "\"Excuse Me Sir\" Billy Butcher Edits",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/843/butchereditscover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/excuse-me-sir-billy-butcher-edits",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "excuse-me-sir-billy-butcher-edits"
+  },
+  {
+    "id": "003-realistic-troll-face-hey-you-might-know-me-already",
+    "image_path": "data/knowyourmeme_latest/picture/003-realistic-troll-face-hey-you-might-know-me-already.jpg",
+    "post_title": "Realistic Troll Face / Hey, You Might Know Me Already",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/821/realtrollcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/realistic-troll-face-hey-you-might-know-me-already",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "realistic-troll-face-hey-you-might-know-me-already"
+  },
+  {
+    "id": "004-planetronika",
+    "image_path": "data/knowyourmeme_latest/picture/004-planetronika.jpg",
+    "post_title": "Planetronika",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/812/planetcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/subcultures/planetronika",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "planetronika"
+  },
+  {
+    "id": "005-everyone-get-in-the-car-we-re-leaving-this-town-now-hermit-purple",
+    "image_path": "data/knowyourmeme_latest/picture/005-everyone-get-in-the-car-we-re-leaving-this-town-now-hermit-purple.jpg",
+    "post_title": "Everyone Get In the Car We're Leaving This Town Now / Hermit Purple",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/779/egitccover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/everyone-get-in-the-car-were-leaving-this-town-now-hermit-purple",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "everyone-get-in-the-car-we-re-leaving-this-town-now-hermit-purple"
+  },
+  {
+    "id": "006-scooby-doo-creepy-run",
+    "image_path": "data/knowyourmeme_latest/picture/006-scooby-doo-creepy-run.jpg",
+    "post_title": "Scooby Doo Creepy Run",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/781/sdcr.jpg",
+    "permalink": "https://knowyourmeme.com/memes/subcultures/scooby-doo-creepy-run",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "scooby-doo-creepy-run"
+  },
+  {
+    "id": "007-anita-sarkeesian-slay-the-spire-2-credit-controversy",
+    "image_path": "data/knowyourmeme_latest/picture/007-anita-sarkeesian-slay-the-spire-2-credit-controversy.jpg",
+    "post_title": "Anita Sarkeesian Slay the Spire 2 Credit Controversy",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/776/ascover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/events/anita-sarkeesian-slay-the-spire-2-credit-controversy",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "anita-sarkeesian-slay-the-spire-2-credit-controversy"
+  },
+  {
+    "id": "008-someone-should-do-it-somebody-has-to-do-it",
+    "image_path": "data/knowyourmeme_latest/picture/008-someone-should-do-it-somebody-has-to-do-it.jpg",
+    "post_title": "Someone Should Do It / Somebody Has to Do It",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/751/ssdi.jpg",
+    "permalink": "https://knowyourmeme.com/memes/someone-should-do-it-somebody-has-to-do-it",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "someone-should-do-it-somebody-has-to-do-it"
+  },
+  {
+    "id": "009-scientology-run-speedrun",
+    "image_path": "data/knowyourmeme_latest/picture/009-scientology-run-speedrun.jpg",
+    "post_title": "Scientology Run / Speedrun",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/653/scrun.jpg",
+    "permalink": "https://knowyourmeme.com/memes/scientology-run-speedrun",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "scientology-run-speedrun"
+  },
+  {
+    "id": "010-sonion",
+    "image_path": "data/knowyourmeme_latest/picture/010-sonion.png",
+    "post_title": "Sonion",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/629/Screenshot_2026-04-07_155017.png",
+    "permalink": "https://knowyourmeme.com/memes/sonion",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "sonion"
+  },
+  {
+    "id": "011-homer-drops-his-donut",
+    "image_path": "data/knowyourmeme_latest/picture/011-homer-drops-his-donut.png",
+    "post_title": "Homer Drops His Donut",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/729/Screenshot_2026-04-28_130354.png",
+    "permalink": "https://knowyourmeme.com/memes/homer-drops-his-donut",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "homer-drops-his-donut"
+  },
+  {
+    "id": "012-thragg-and-viltrumites-panel",
+    "image_path": "data/knowyourmeme_latest/picture/012-thragg-and-viltrumites-panel.jpg",
+    "post_title": "Thragg and Viltrumites Panel",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/763/thraggcil.jpg",
+    "permalink": "https://knowyourmeme.com/memes/thragg-and-viltrumites-panel",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "thragg-and-viltrumites-panel"
+  },
+  {
+    "id": "013-you-found-lost-media-it-s-problematic-media",
+    "image_path": "data/knowyourmeme_latest/picture/013-you-found-lost-media-it-s-problematic-media.png",
+    "post_title": "You Found Lost Media / It's Problematic Media",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/753/Schermafbeelding_2026-05-02_161559.png",
+    "permalink": "https://knowyourmeme.com/memes/you-found-lost-media-its-problematic-media",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "you-found-lost-media-it-s-problematic-media"
+  },
+  {
+    "id": "014-jpmorgan-lorna-hajdini-and-chirayu-rana-scandal",
+    "image_path": "data/knowyourmeme_latest/picture/014-jpmorgan-lorna-hajdini-and-chirayu-rana-scandal.jpg",
+    "post_title": "JPMorgan Lorna Hajdini and Chirayu Rana Scandal",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/748/JPM_Scandal_banner_image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/events/jpmorgan-lorna-hajdini-and-chirayu-rana-scandal",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "jpmorgan-lorna-hajdini-and-chirayu-rana-scandal"
+  },
+  {
+    "id": "015-rod-wave-arby-s-takeover",
+    "image_path": "data/knowyourmeme_latest/picture/015-rod-wave-arby-s-takeover.png",
+    "post_title": "Rod Wave Arby's Takeover",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/691/Screenshot_2026-04-20_142306.png",
+    "permalink": "https://knowyourmeme.com/memes/rod-wave-arbys-takeover",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "rod-wave-arby-s-takeover"
+  },
+  {
+    "id": "016-hello-it-s-me-crewmate",
+    "image_path": "data/knowyourmeme_latest/picture/016-hello-it-s-me-crewmate.jpg",
+    "post_title": "Hello, It's Me Crewmate",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/724/amonguscrewmatecover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/hello-its-me-crewmate",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "hello-it-s-me-crewmate"
+  },
+  {
+    "id": "017-red-button-or-blue-button-question",
+    "image_path": "data/knowyourmeme_latest/picture/017-red-button-or-blue-button-question.jpg",
+    "post_title": "Red Button or Blue Button Question",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/721/Tim_Urban_Red_Blue_Button_Poll_Banner_Image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/red-button-or-blue-button-question",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "red-button-or-blue-button-question"
+  },
+  {
+    "id": "018-reginald-skulinski-eating-disappointed-monster-house",
+    "image_path": "data/knowyourmeme_latest/picture/018-reginald-skulinski-eating-disappointed-monster-house.jpg",
+    "post_title": "Reginald Skulinski Eating / Disappointed (Monster House)",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/714/d1cover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/reginald-skulinski-eating-disappointed-monster-house",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "reginald-skulinski-eating-disappointed-monster-house"
+  },
+  {
+    "id": "019-scarlet-skips",
+    "image_path": "data/knowyourmeme_latest/picture/019-scarlet-skips.jpg",
+    "post_title": "Scarlet Skips",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/702/scarletcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/subcultures/scarlet-skips",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "scarlet-skips"
+  },
+  {
+    "id": "020-tracksuit-mark-gooning-and-screaming",
+    "image_path": "data/knowyourmeme_latest/picture/020-tracksuit-mark-gooning-and-screaming.jpg",
+    "post_title": "Tracksuit Mark Gooning and Screaming",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/688/tsmgcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/tracksuit-mark-gooning-and-screaming",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "tracksuit-mark-gooning-and-screaming"
+  },
+  {
+    "id": "021-cryana-twitch-chat-badge-controversy-pragmata",
+    "image_path": "data/knowyourmeme_latest/picture/021-cryana-twitch-chat-badge-controversy-pragmata.jpg",
+    "post_title": "Cryana Twitch Chat Badge Controversy (Pragmata)",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/682/cryanacover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/events/cryana-twitch-chat-badge-controversy-pragmata",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "cryana-twitch-chat-badge-controversy-pragmata"
+  },
+  {
+    "id": "022-sykkuno-cheating-drama",
+    "image_path": "data/knowyourmeme_latest/picture/022-sykkuno-cheating-drama.jpg",
+    "post_title": "Sykkuno Cheating Drama",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/683/sykkunocheated.jpg",
+    "permalink": "https://knowyourmeme.com/memes/events/sykkuno-cheating-drama",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "sykkuno-cheating-drama"
+  },
+  {
+    "id": "023-angry-bird-ear-angry-birds-ear",
+    "image_path": "data/knowyourmeme_latest/picture/023-angry-bird-ear-angry-birds-ear.jpg",
+    "post_title": "Angry Bird Ear / Angry Birds Ear",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/419/Angry_Bird_Ear_meme_banner.jpg",
+    "permalink": "https://knowyourmeme.com/memes/angry-bird-ear-angry-birds-ear",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "angry-bird-ear-angry-birds-ear"
+  },
+  {
+    "id": "024-sabrina-carpenter-yodeling-zaghrouta-reaction",
+    "image_path": "data/knowyourmeme_latest/picture/024-sabrina-carpenter-yodeling-zaghrouta-reaction.jpg",
+    "post_title": "Sabrina Carpenter Yodeling / Zaghrouta Reaction",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/658/sabyodcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/sabrina-carpenter-yodeling-zaghrouta-reaction",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "sabrina-carpenter-yodeling-zaghrouta-reaction"
+  },
+  {
+    "id": "025-you-ain-t-nothin-but-a-hound-dog-hound-dog-house-remix",
+    "image_path": "data/knowyourmeme_latest/picture/025-you-ain-t-nothin-but-a-hound-dog-hound-dog-house-remix.png",
+    "post_title": "You Ain't Nothin' But A Hound Dog / Hound Dog House Remix",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/656/Screenshot_2026-04-13_124008.png",
+    "permalink": "https://knowyourmeme.com/memes/you-aint-nothin-but-a-hound-dog-hound-dog-house-remix",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "you-ain-t-nothin-but-a-hound-dog-hound-dog-house-remix"
+  },
+  {
+    "id": "026-doorbell-chud-jason-thomas-nichols",
+    "image_path": "data/knowyourmeme_latest/picture/026-doorbell-chud-jason-thomas-nichols.jpg",
+    "post_title": "Doorbell Chud / Jason Thomas Nichols",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/650/Jason_Thomas_Nichols_-_Harry_Dresden.jpg",
+    "permalink": "https://knowyourmeme.com/memes/doorbell-chud-jason-thomas-nichols",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "doorbell-chud-jason-thomas-nichols"
+  },
+  {
+    "id": "027-bedtime-stacking",
+    "image_path": "data/knowyourmeme_latest/picture/027-bedtime-stacking.jpg",
+    "post_title": "Bedtime Stacking",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/645/Bedtime_Stacking_banner_image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/bedtime-stacking",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "bedtime-stacking"
+  },
+  {
+    "id": "028-heart-butt-challenge",
+    "image_path": "data/knowyourmeme_latest/picture/028-heart-butt-challenge.jpg",
+    "post_title": "Heart Butt Challenge",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/630/coverb1.jpg",
+    "permalink": "https://knowyourmeme.com/memes/heart-butt-challenge",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "heart-butt-challenge"
+  },
+  {
+    "id": "029-geeked-patrick-star-happy-patrick",
+    "image_path": "data/knowyourmeme_latest/picture/029-geeked-patrick-star-happy-patrick.jpg",
+    "post_title": "Geeked Patrick Star / Happy Patrick",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/430/gpcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/geeked-patrick-star-happy-patrick",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "geeked-patrick-star-happy-patrick"
+  },
+  {
+    "id": "030-klay-thompson-eggs-after-11-gay-edits",
+    "image_path": "data/knowyourmeme_latest/picture/030-klay-thompson-eggs-after-11-gay-edits.jpg",
+    "post_title": "Klay Thompson Eggs After 11 / Gay Edits",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/624/ktcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/klay-thompson-eggs-after-11-gay-edits",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "klay-thompson-eggs-after-11-gay-edits"
+  },
+  {
+    "id": "031-7x7-49",
+    "image_path": "data/knowyourmeme_latest/picture/031-7x7-49.jpg",
+    "post_title": "7x7=49",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/620/proofthatcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/7x749",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "7x7-49"
+  },
+  {
+    "id": "032-incidental-49a-real-estate-fish-stan-edits",
+    "image_path": "data/knowyourmeme_latest/picture/032-incidental-49a-real-estate-fish-stan-edits.png",
+    "post_title": "Incidental 49A / Real Estate Fish Stan Edits",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/614/Screenshot_2026-04-03_154613.png",
+    "permalink": "https://knowyourmeme.com/memes/incidental-49a-real-estate-fish-stan-edits",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "incidental-49a-real-estate-fish-stan-edits"
+  },
+  {
+    "id": "033-invincible-wobbly-animation-invincible-wobble-edits",
+    "image_path": "data/knowyourmeme_latest/picture/033-invincible-wobbly-animation-invincible-wobble-edits.jpg",
+    "post_title": "Invincible Wobbly Animation / Invincible Wobble Edits",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/606/iwecover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/invincible-wobbly-animation-invincible-wobble-edits",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "invincible-wobbly-animation-invincible-wobble-edits"
+  },
+  {
+    "id": "034-larp-larping",
+    "image_path": "data/knowyourmeme_latest/picture/034-larp-larping.jpg",
+    "post_title": "LARP / LARPing",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/604/larp_widescreen.jpg",
+    "permalink": "https://knowyourmeme.com/memes/larp-larping",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "larp-larping"
+  },
+  {
+    "id": "035-these-nuggets-ain-t-ready",
+    "image_path": "data/knowyourmeme_latest/picture/035-these-nuggets-ain-t-ready.jpg",
+    "post_title": "These Nuggets Ain't Ready",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/565/tnar.jpg",
+    "permalink": "https://knowyourmeme.com/memes/these-nuggets-aint-ready",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "these-nuggets-ain-t-ready"
+  },
+  {
+    "id": "036-thank-you-chainsaw-man",
+    "image_path": "data/knowyourmeme_latest/picture/036-thank-you-chainsaw-man.jpg",
+    "post_title": "Thank You... Chainsaw Man",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/554/tycm.jpg",
+    "permalink": "https://knowyourmeme.com/memes/thank-you-chainsaw-man",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "thank-you-chainsaw-man"
+  },
+  {
+    "id": "037-tel-aviv-impressed",
+    "image_path": "data/knowyourmeme_latest/picture/037-tel-aviv-impressed.jpg",
+    "post_title": "Tel Aviv Impressed",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/555/cover_(5).jpg",
+    "permalink": "https://knowyourmeme.com/memes/tel-aviv-impressed",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "tel-aviv-impressed"
+  },
+  {
+    "id": "038-crazy-squidward",
+    "image_path": "data/knowyourmeme_latest/picture/038-crazy-squidward.png",
+    "post_title": "Crazy Squidward",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/540/Screenshot_2026-03-24_143859.png",
+    "permalink": "https://knowyourmeme.com/memes/crazy-squidward",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "crazy-squidward"
+  },
+  {
+    "id": "039-king-nasir-dance",
+    "image_path": "data/knowyourmeme_latest/picture/039-king-nasir-dance.png",
+    "post_title": "King Nasir Dance",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/530/Screenshot_2026-03-23_133255.png",
+    "permalink": "https://knowyourmeme.com/memes/king-nasir-dance",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "king-nasir-dance"
+  },
+  {
+    "id": "040-chuck-norris",
+    "image_path": "data/knowyourmeme_latest/picture/040-chuck-norris.jpg",
+    "post_title": "Chuck Norris",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/006/349/Chuck_Norris_banner_image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/people/chuck-norris",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "chuck-norris"
+  },
+  {
+    "id": "041-tung-tung-god",
+    "image_path": "data/knowyourmeme_latest/picture/041-tung-tung-god.jpg",
+    "post_title": "Tung Tung God",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/510/ttgodcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/tung-tung-god",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "tung-tung-god"
+  },
+  {
+    "id": "042-dlss-5-off-dlss-5-on",
+    "image_path": "data/knowyourmeme_latest/picture/042-dlss-5-off-dlss-5-on.jpg",
+    "post_title": "DLSS 5 Off / DLSS 5 On",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/498/HDjb9LkXYAA7seZ.jfif",
+    "permalink": "https://knowyourmeme.com/memes/dlss-5-off-dlss-5-on",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "dlss-5-off-dlss-5-on"
+  },
+  {
+    "id": "043-say-wallahi-bro",
+    "image_path": "data/knowyourmeme_latest/picture/043-say-wallahi-bro.jpg",
+    "post_title": "Say Wallahi Bro",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/495/swb.jpg",
+    "permalink": "https://knowyourmeme.com/memes/say-wallahi-bro",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "say-wallahi-bro"
+  },
+  {
+    "id": "044-i-just-hit-the-jackpot",
+    "image_path": "data/knowyourmeme_latest/picture/044-i-just-hit-the-jackpot.jpg",
+    "post_title": "I Just Hit the Jackpot",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/492/jackpotcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/i-just-hit-the-jackpot",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "i-just-hit-the-jackpot"
+  },
+  {
+    "id": "045-strait-of-hormuz-bypass-solutions",
+    "image_path": "data/knowyourmeme_latest/picture/045-strait-of-hormuz-bypass-solutions.jpg",
+    "post_title": "Strait of Hormuz Bypass Solutions",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/488/Strait_of_Hormuz_Bypass_Solutions.jpg",
+    "permalink": "https://knowyourmeme.com/memes/strait-of-hormuz-bypass-solutions",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "strait-of-hormuz-bypass-solutions"
+  },
+  {
+    "id": "046-did-the-journal-factory-explode",
+    "image_path": "data/knowyourmeme_latest/picture/046-did-the-journal-factory-explode.jpg",
+    "post_title": "Did the Journal Factory Explode",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/484/jfactorycover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/did-the-journal-factory-explode",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "did-the-journal-factory-explode"
+  },
+  {
+    "id": "047-scuba-dance",
+    "image_path": "data/knowyourmeme_latest/picture/047-scuba-dance.jpg",
+    "post_title": "Scuba Dance",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/480/sdsdc.jpg",
+    "permalink": "https://knowyourmeme.com/memes/scuba-dance",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "scuba-dance"
+  },
+  {
+    "id": "048-the-faithful-sheriff-drwitnesser",
+    "image_path": "data/knowyourmeme_latest/picture/048-the-faithful-sheriff-drwitnesser.jpg",
+    "post_title": "The Faithful Sheriff / DrWitnesser",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/473/tfpc.jpg",
+    "permalink": "https://knowyourmeme.com/memes/people/the-faithful-sheriff-drwitnesser",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "the-faithful-sheriff-drwitnesser"
+  },
+  {
+    "id": "049-nick-wilde-scuba-dance",
+    "image_path": "data/knowyourmeme_latest/picture/049-nick-wilde-scuba-dance.jpg",
+    "post_title": "Nick Wilde Scuba Dance",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/470/scubacover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/nick-wilde-scuba-dance",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "nick-wilde-scuba-dance"
+  },
+  {
+    "id": "050-gyaru-bulbasaur",
+    "image_path": "data/knowyourmeme_latest/picture/050-gyaru-bulbasaur.jpg",
+    "post_title": "Gyaru Bulbasaur",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/467/gbulbcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/gyaru-bulbasaur",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "gyaru-bulbasaur"
+  },
+  {
+    "id": "051-your-ai-slop-bores-me",
+    "image_path": "data/knowyourmeme_latest/picture/051-your-ai-slop-bores-me.jpg",
+    "post_title": "Your AI Slop Bores Me",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/460/yaisbm.jpg",
+    "permalink": "https://knowyourmeme.com/memes/sites/your-ai-slop-bores-me",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "your-ai-slop-bores-me"
+  },
+  {
+    "id": "052-kirigiri-execution",
+    "image_path": "data/knowyourmeme_latest/picture/052-kirigiri-execution.jpg",
+    "post_title": "Kirigiri Execution",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/296/Kirigiri_Execution_banner_image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/kirigiri-execution",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "kirigiri-execution"
+  },
+  {
+    "id": "053-computa-make-x-into-y-computer-guy",
+    "image_path": "data/knowyourmeme_latest/picture/053-computa-make-x-into-y-computer-guy.png",
+    "post_title": "Computa, Make X Into Y / Computer Guy",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/458/Screenshot_2026-03-09_104640.png",
+    "permalink": "https://knowyourmeme.com/memes/computa-make-x-into-y-computer-guy",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "computa-make-x-into-y-computer-guy"
+  },
+  {
+    "id": "054-socrates-skeleton-ragebait-videos",
+    "image_path": "data/knowyourmeme_latest/picture/054-socrates-skeleton-ragebait-videos.jpg",
+    "post_title": "Socrates Skeleton Ragebait Videos",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/457/socratescover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/socrates-skeleton-ragebait-videos",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "socrates-skeleton-ragebait-videos"
+  },
+  {
+    "id": "055-eladeselesobinubaliepraso",
+    "image_path": "data/knowyourmeme_latest/picture/055-eladeselesobinubaliepraso.jpg",
+    "post_title": "Eladeselesobinubaliepraso",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/428/elacover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/eladeselesobinubaliepraso",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "eladeselesobinubaliepraso"
+  },
+  {
+    "id": "056-the-shape-store-ai-video",
+    "image_path": "data/knowyourmeme_latest/picture/056-the-shape-store-ai-video.jpg",
+    "post_title": "The Shape Store (AI Video)",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/420/shapestorecover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/the-shape-store-ai-video",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "the-shape-store-ai-video"
+  },
+  {
+    "id": "057-alex-jones-patriot-vampire-nationalist",
+    "image_path": "data/knowyourmeme_latest/picture/057-alex-jones-patriot-vampire-nationalist.jpg",
+    "post_title": "Alex Jones \"Patriot, Vampire, Nationalist\"",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/409/vampirecover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/alex-jones-patriot-vampire-nationalist",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "alex-jones-patriot-vampire-nationalist"
+  },
+  {
+    "id": "058-chad-rankings",
+    "image_path": "data/knowyourmeme_latest/picture/058-chad-rankings.png",
+    "post_title": "Chad Rankings",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/375/Screenshot_2026-02-24_154441.png",
+    "permalink": "https://knowyourmeme.com/memes/chad-rankings",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "chad-rankings"
+  },
+  {
+    "id": "059-ai-pigeon-doctor-walking-down-hallway",
+    "image_path": "data/knowyourmeme_latest/picture/059-ai-pigeon-doctor-walking-down-hallway.jpg",
+    "post_title": "AI Pigeon Doctor Walking Down Hallway",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/368/pigeoncover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/ai-pigeon-doctor-walking-down-hallway",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "ai-pigeon-doctor-walking-down-hallway"
+  },
+  {
+    "id": "060-low-cortisol-dance",
+    "image_path": "data/knowyourmeme_latest/picture/060-low-cortisol-dance.jpg",
+    "post_title": "Low Cortisol Dance",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/359/agnes_cortisol_level.jpg",
+    "permalink": "https://knowyourmeme.com/memes/low-cortisol-dance",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "low-cortisol-dance"
+  },
+  {
+    "id": "061-adam-rose-pb-j-bites-instagram-ad-if-you-mash-strawberries",
+    "image_path": "data/knowyourmeme_latest/picture/061-adam-rose-pb-j-bites-instagram-ad-if-you-mash-strawberries.jpg",
+    "post_title": "Adam Rose PB&J Bites Instagram Ad / If You Mash Strawberries",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/356/adamrosecover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/adam-rose-pbj-bites-instagram-ad-if-you-mash-strawberries",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "adam-rose-pb-j-bites-instagram-ad-if-you-mash-strawberries"
+  },
+  {
+    "id": "062-evan-burger-his-last-name-is-burger",
+    "image_path": "data/knowyourmeme_latest/picture/062-evan-burger-his-last-name-is-burger.jpg",
+    "post_title": "Evan Burger / His Last Name Is Burger",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/355/burger_cover_best.jpg",
+    "permalink": "https://knowyourmeme.com/memes/evan-burger-his-last-name-is-burger",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "evan-burger-his-last-name-is-burger"
+  },
+  {
+    "id": "063-baby-boo-syndrome",
+    "image_path": "data/knowyourmeme_latest/picture/063-baby-boo-syndrome.jpg",
+    "post_title": "Baby Boo Syndrome",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/352/bboocover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/baby-boo-syndrome",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "baby-boo-syndrome"
+  },
+  {
+    "id": "064-japan-is-turning-footsteps-into-electricity-copypasta",
+    "image_path": "data/knowyourmeme_latest/picture/064-japan-is-turning-footsteps-into-electricity-copypasta.jpg",
+    "post_title": "Japan Is Turning Footsteps Into Electricity Copypasta",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/345/japanesecover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/japan-is-turning-footsteps-into-electricity-copypasta",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "japan-is-turning-footsteps-into-electricity-copypasta"
+  },
+  {
+    "id": "065-good-answer-nephew",
+    "image_path": "data/knowyourmeme_latest/picture/065-good-answer-nephew.jpg",
+    "post_title": "Good Answer Nephew",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/342/goodanswercover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/good-answer-nephew",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "good-answer-nephew"
+  },
+  {
+    "id": "066-the-destiny-of-marge",
+    "image_path": "data/knowyourmeme_latest/picture/066-the-destiny-of-marge.jpg",
+    "post_title": "The Destiny of Marge",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/335/dofmargecover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/the-destiny-of-marge",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "the-destiny-of-marge"
+  },
+  {
+    "id": "067-why-buy-an-expensive-matcha-cake",
+    "image_path": "data/knowyourmeme_latest/picture/067-why-buy-an-expensive-matcha-cake.jpg",
+    "post_title": "Why Buy An Expensive Matcha Cake?",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/327/whybuyccover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/why-buy-an-expensive-matcha-cake",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "why-buy-an-expensive-matcha-cake"
+  },
+  {
+    "id": "068-high-school-kid-punches-ice-supporter-okay-punch-kid",
+    "image_path": "data/knowyourmeme_latest/picture/068-high-school-kid-punches-ice-supporter-okay-punch-kid.jpg",
+    "post_title": "High School Kid Punches ICE Supporter / Okay Punch Kid",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/319/punchcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/high-school-kid-punches-ice-supporter-okay-punch-kid",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "high-school-kid-punches-ice-supporter-okay-punch-kid"
+  },
+  {
+    "id": "069-james-pierce",
+    "image_path": "data/knowyourmeme_latest/picture/069-james-pierce.jpg",
+    "post_title": "James Pierce",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/305/piercecover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/james-pierce",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "james-pierce"
+  },
+  {
+    "id": "070-she-s-no-more-more-coursemediocre7998-catfishing-drama",
+    "image_path": "data/knowyourmeme_latest/picture/070-she-s-no-more-more-coursemediocre7998-catfishing-drama.jpg",
+    "post_title": "She's No More More / CourseMediocre7998 Catfishing Drama",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/302/snmm.jpg",
+    "permalink": "https://knowyourmeme.com/memes/shes-no-more-more-coursemediocre7998-catfishing-drama",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "she-s-no-more-more-coursemediocre7998-catfishing-drama"
+  },
+  {
+    "id": "071-varis-gilaj-asu-frat-leader",
+    "image_path": "data/knowyourmeme_latest/picture/071-varis-gilaj-asu-frat-leader.jpg",
+    "post_title": "Varis Gilaj / ASU Frat Leader",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/295/framemoggercover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/people/varis-gilaj-asu-frat-leader",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "varis-gilaj-asu-frat-leader"
+  },
+  {
+    "id": "072-cherry-on-top",
+    "image_path": "data/knowyourmeme_latest/picture/072-cherry-on-top.png",
+    "post_title": "Cherry On Top",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/294/Untitled-1.png",
+    "permalink": "https://knowyourmeme.com/memes/cherry-on-top",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "cherry-on-top"
+  },
+  {
+    "id": "073-big-john-machine",
+    "image_path": "data/knowyourmeme_latest/picture/073-big-john-machine.jpg",
+    "post_title": "Big John Machine",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/292/bmm.jpg",
+    "permalink": "https://knowyourmeme.com/memes/big-john-machine",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "big-john-machine"
+  },
+  {
+    "id": "074-camila-parker-camilaparkedhere",
+    "image_path": "data/knowyourmeme_latest/picture/074-camila-parker-camilaparkedhere.jpg",
+    "post_title": "Camila Parker / Camilaparkedhere",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/287/camicoverbetter.jpg",
+    "permalink": "https://knowyourmeme.com/memes/people/camila-parker-camilaparkedhere",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "camila-parker-camilaparkedhere"
+  },
+  {
+    "id": "075-dany-slicer",
+    "image_path": "data/knowyourmeme_latest/picture/075-dany-slicer.jpg",
+    "post_title": "Dany Slicer",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/280/dslice.jpg",
+    "permalink": "https://knowyourmeme.com/memes/dany-slicer",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "dany-slicer"
+  },
+  {
+    "id": "076-jestergooning",
+    "image_path": "data/knowyourmeme_latest/picture/076-jestergooning.jpg",
+    "post_title": "Jestergooning",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/272/jgooncover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/jestergooning",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "jestergooning"
+  },
+  {
+    "id": "077-big-yahu",
+    "image_path": "data/knowyourmeme_latest/picture/077-big-yahu.jpg",
+    "post_title": "Big Yahu",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/271/byahucover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/big-yahu",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "big-yahu"
+  },
+  {
+    "id": "078-bakushin-armpit-gif",
+    "image_path": "data/knowyourmeme_latest/picture/078-bakushin-armpit-gif.jpg",
+    "post_title": "Bakushin Armpit GIF",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/266/bakushingifcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/bakushin-armpit-gif",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "bakushin-armpit-gif"
+  },
+  {
+    "id": "079-clavicular-frame-mogged-by-asu-frat-leader",
+    "image_path": "data/knowyourmeme_latest/picture/079-clavicular-frame-mogged-by-asu-frat-leader.jpg",
+    "post_title": "Clavicular Frame Mogged by ASU Frat Leader",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/263/framemogcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/clavicular-frame-mogged-by-asu-frat-leader",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "clavicular-frame-mogged-by-asu-frat-leader"
+  },
+  {
+    "id": "080-sabrina-carpenter-licking-lips",
+    "image_path": "data/knowyourmeme_latest/picture/080-sabrina-carpenter-licking-lips.jpg",
+    "post_title": "Sabrina Carpenter Licking Lips",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/252/scarcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/sabrina-carpenter-licking-lips",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "sabrina-carpenter-licking-lips"
+  },
+  {
+    "id": "081-nia-noir-nianoir-xo",
+    "image_path": "data/knowyourmeme_latest/picture/081-nia-noir-nianoir-xo.jpg",
+    "post_title": "Nia Noir / NiaNoir.xo",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/235/nianoircover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/people/nia-noir-nianoirxo",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "nia-noir-nianoir-xo"
+  },
+  {
+    "id": "082-jonatanas-kazlauskas-sorry-by-justin-bieber-performance",
+    "image_path": "data/knowyourmeme_latest/picture/082-jonatanas-kazlauskas-sorry-by-justin-bieber-performance.jpg",
+    "post_title": "Jonatanas Kazlauskas' \"Sorry\" by Justin Bieber Performance",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/234/jonatancover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/jonatanas-kazlauskas-sorry-by-justin-bieber-performance",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "jonatanas-kazlauskas-sorry-by-justin-bieber-performance"
+  },
+  {
+    "id": "083-logan-paul-never-stress",
+    "image_path": "data/knowyourmeme_latest/picture/083-logan-paul-never-stress.jpg",
+    "post_title": "Logan Paul Never StreSS",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/220/IMG_0293.jpeg",
+    "permalink": "https://knowyourmeme.com/memes/logan-paul-never-stress",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "logan-paul-never-stress"
+  },
+  {
+    "id": "084-viva-la-vida-by-cosplay",
+    "image_path": "data/knowyourmeme_latest/picture/084-viva-la-vida-by-cosplay.jpg",
+    "post_title": "Viva La Vida by Cosplay",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/215/vvc.jpg",
+    "permalink": "https://knowyourmeme.com/memes/viva-la-vida-by-cosplay",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "viva-la-vida-by-cosplay"
+  },
+  {
+    "id": "085-cortisol-level-cortisol-spike",
+    "image_path": "data/knowyourmeme_latest/picture/085-cortisol-level-cortisol-spike.jpg",
+    "post_title": "Cortisol Level / Cortisol Spike",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/206/Cortisol_level_spike_meme.jpg",
+    "permalink": "https://knowyourmeme.com/memes/cortisol-level-cortisol-spike",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "cortisol-level-cortisol-spike"
+  },
+  {
+    "id": "086-baby-youtube-thumbnails",
+    "image_path": "data/knowyourmeme_latest/picture/086-baby-youtube-thumbnails.jpg",
+    "post_title": "Baby YouTube Thumbnails",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/204/bafkreid4rg3nmzdgxmsl5uimuew4lvykigqy2vow5cjmmjwsypmoj547km.jpg",
+    "permalink": "https://knowyourmeme.com/memes/baby-youtube-thumbnails",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "baby-youtube-thumbnails"
+  },
+  {
+    "id": "087-pennywise-we-all-float-bathtub-drawing",
+    "image_path": "data/knowyourmeme_latest/picture/087-pennywise-we-all-float-bathtub-drawing.jpg",
+    "post_title": "Pennywise \"We All Float\" Bathtub Drawing",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/200/wafcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/pennywise-we-all-float-bathtub-drawing",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "pennywise-we-all-float-bathtub-drawing"
+  },
+  {
+    "id": "088-who-is-he",
+    "image_path": "data/knowyourmeme_latest/picture/088-who-is-he.jpg",
+    "post_title": "Who Is He?",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/198/who_is_he_meme_banner_image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/who-is-he",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "who-is-he"
+  },
+  {
+    "id": "089-send-him-2-3-years-dagestan-and-forget",
+    "image_path": "data/knowyourmeme_latest/picture/089-send-him-2-3-years-dagestan-and-forget.jpg",
+    "post_title": "Send Him 2-3 Years Dagestan and Forget",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/189/dagestancvo.jpg",
+    "permalink": "https://knowyourmeme.com/memes/send-him-2-3-years-dagestan-and-forget",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "send-him-2-3-years-dagestan-and-forget"
+  },
+  {
+    "id": "090-nutella-tricks",
+    "image_path": "data/knowyourmeme_latest/picture/090-nutella-tricks.jpg",
+    "post_title": "Nutella Tricks",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/184/nutellatrickscover1.jpg",
+    "permalink": "https://knowyourmeme.com/memes/nutella-tricks",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "nutella-tricks"
+  },
+  {
+    "id": "091-2026-ice-shooting-of-alex-pretti",
+    "image_path": "data/knowyourmeme_latest/picture/091-2026-ice-shooting-of-alex-pretti.jpg",
+    "post_title": "2026 ICE Shooting of Alex Pretti",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/181/apretticover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/events/2026-ice-shooting-of-alex-pretti",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "2026-ice-shooting-of-alex-pretti"
+  },
+  {
+    "id": "092-ai-food-yelling-at-you",
+    "image_path": "data/knowyourmeme_latest/picture/092-ai-food-yelling-at-you.jpg",
+    "post_title": "AI Food Yelling At You",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/172/coverfoodai.jpg",
+    "permalink": "https://knowyourmeme.com/memes/ai-food-yelling-at-you",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "ai-food-yelling-at-you"
+  },
+  {
+    "id": "093-listen-up-christopher-nightmare-freddy-interrupts",
+    "image_path": "data/knowyourmeme_latest/picture/093-listen-up-christopher-nightmare-freddy-interrupts.jpg",
+    "post_title": "Listen Up, Christopher / Nightmare Freddy Interrupts",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/166/listenupcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/listen-up-christopher-nightmare-freddy-interrupts",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "listen-up-christopher-nightmare-freddy-interrupts"
+  },
+  {
+    "id": "094-jestermaxxing",
+    "image_path": "data/knowyourmeme_latest/picture/094-jestermaxxing.jpg",
+    "post_title": "Jestermaxxing",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/165/jestermaxxingcover.jpg",
+    "permalink": "https://knowyourmeme.com/memes/jestermaxxing",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "jestermaxxing"
+  },
+  {
+    "id": "095-penguin-walking-toward-mountain-nihilist-penguin",
+    "image_path": "data/knowyourmeme_latest/picture/095-penguin-walking-toward-mountain-nihilist-penguin.jpg",
+    "post_title": "Penguin Walking Toward Mountain / Nihilist Penguin",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/159/Lonely_Penguin_Mountain_meme_banner_image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/penguin-walking-toward-mountain-nihilist-penguin",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "penguin-walking-toward-mountain-nihilist-penguin"
+  },
+  {
+    "id": "096-who-is-this",
+    "image_path": "data/knowyourmeme_latest/picture/096-who-is-this.jpg",
+    "post_title": "Who Is This?",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/158/Who_IS_This_meme_banner_image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/who-is-this",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "who-is-this"
+  },
+  {
+    "id": "097-victoria-beckham-s-dance-at-son-s-wedding-controversy",
+    "image_path": "data/knowyourmeme_latest/picture/097-victoria-beckham-s-dance-at-son-s-wedding-controversy.jpg",
+    "post_title": "Victoria Beckham's Dance At Son's Wedding Controversy",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/153/Victoria_Beckham_Wedding_Dance_Controversy_banner_image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/events/victoria-beckhams-dance-at-sons-wedding-controversy",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "victoria-beckham-s-dance-at-son-s-wedding-controversy"
+  },
+  {
+    "id": "098-donald-trump-s-2026-acquisition-of-greenland-push",
+    "image_path": "data/knowyourmeme_latest/picture/098-donald-trump-s-2026-acquisition-of-greenland-push.jpg",
+    "post_title": "Donald Trump's 2026 Acquisition of Greenland Push",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/141/Trump_Greenland_banner_image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/events/donald-trumps-2026-acquisition-of-greenland-push",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "donald-trump-s-2026-acquisition-of-greenland-push"
+  },
+  {
+    "id": "099-goo-goo-gaga-santa-claus",
+    "image_path": "data/knowyourmeme_latest/picture/099-goo-goo-gaga-santa-claus.jpg",
+    "post_title": "Goo Goo Gaga Santa Claus",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/127/Goo_Goo_Ga_Ga_Santa_meme_banner_image.jpg",
+    "permalink": "https://knowyourmeme.com/memes/goo-goo-gaga-santa-claus",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "goo-goo-gaga-santa-claus"
+  },
+  {
+    "id": "100-naoya-hair-flip",
+    "image_path": "data/knowyourmeme_latest/picture/100-naoya-hair-flip.png",
+    "post_title": "Naoya Hair Flip",
+    "image_url": "https://i.kym-cdn.com/entries/icons/original/000/056/116/naoya_flipping_hair.png",
+    "permalink": "https://knowyourmeme.com/memes/naoya-hair-flip",
+    "upvotes": 0,
+    "source_subreddit": "knowyourmeme",
+    "meme_template_name": "naoya-hair-flip"
+  }
+]

@@ -41,23 +41,31 @@ async def search(
 
     qfilter = _build_filter(template_filter, psychological_state_filter)
 
+    prefetches = []
+    if w.visual > 0.01:
+        prefetches.append(models.Prefetch(
+            query=visual_q,
+            using="visual",
+            limit=_candidates_per_space(w.visual, k),
+            filter=qfilter,
+        ))
+    if w.irony > 0.01:
+        prefetches.append(models.Prefetch(
+            query=irony_q,
+            using="irony",
+            limit=_candidates_per_space(w.irony, k),
+            filter=qfilter,
+        ))
+    if not prefetches:
+        prefetches = [
+            models.Prefetch(query=visual_q, using="visual", limit=k, filter=qfilter),
+            models.Prefetch(query=irony_q, using="irony", limit=k, filter=qfilter),
+        ]
+
     client = get_qdrant()
     res = await client.query_points(
         collection_name=config.QDRANT_COLLECTION,
-        prefetch=[
-            models.Prefetch(
-                query=visual_q,
-                using="visual",
-                limit=_candidates_per_space(w.visual, k),
-                filter=qfilter,
-            ),
-            models.Prefetch(
-                query=irony_q,
-                using="irony",
-                limit=_candidates_per_space(w.irony, k),
-                filter=qfilter,
-            ),
-        ],
+        prefetch=prefetches,
         query=models.FusionQuery(fusion=models.Fusion.RRF),
         limit=k,
         with_payload=True,

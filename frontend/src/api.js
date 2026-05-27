@@ -1,14 +1,17 @@
-const API = import.meta.env.VITE_API ?? 'http://localhost:8000'
+const API = typeof import.meta !== 'undefined' && import.meta.env?.VITE_API
+  ? import.meta.env.VITE_API
+  : 'http://localhost:8000'
 
 export async function searchMemes({ q, k = 24, visualWeight = 0.35, ironyWeight = 0.65, template = null }) {
-  const url = new URL(`${API}/search`)
-  url.searchParams.set('q', q)
-  url.searchParams.set('k', String(k))
-  url.searchParams.set('visual_weight', String(visualWeight))
-  url.searchParams.set('irony_weight', String(ironyWeight))
-  if (template) url.searchParams.set('template', template)
+  const params = new URLSearchParams({
+    q,
+    k: String(k),
+    visual_weight: String(visualWeight),
+    irony_weight: String(ironyWeight),
+  })
+  if (template) params.set('template', template)
 
-  const res = await fetch(url)
+  const res = await fetch(`${API}/search?${params}`)
   if (!res.ok) throw new Error(`search failed: ${res.status}`)
   return res.json()
 }

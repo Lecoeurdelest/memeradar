@@ -59,6 +59,18 @@ header p { color: var(--muted); margin: 4px 0 24px; }
 .modal-inner img { max-width: 500px; max-height: 70vh; border-radius: 8px; }
 .modal-inner .info { flex: 1; }
 .modal-inner h3 { margin-top: 0; }
-.modal-inner .irony { color: var(--accent); font-style: italic; }
 .modal-inner .lineage { background: #1f1f29; padding: 12px; border-radius: 8px; font-size: 14px; }
+.modal-inner .core-joke { color: var(--fg); font-size: 15px; margin: 0 0 8px; }
+.modal-inner .psych { color: var(--accent); font-size: 13px; margin: 0 0 8px; }
+.modal-inner .subtext { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
 .modal-inner a { color: var(--accent); display: inline-block; margin-top: 12px; }
+
+.empty {
+  text-align: center; color: var(--muted); padding: 64px 0; font-size: 18px;
+}
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #ff3d7f; color: #fff; padding: 12px 24px; border-radius: 8px;
+  font-size: 14px; z-index: 100; box-shadow: 0 4px 24px rgba(0,0,0,.5);
+}

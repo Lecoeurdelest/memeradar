@@ -97,7 +97,7 @@ Goal: `/search` endpoint returns RRF-fused results with Neo4j lineage. The demo'
 
 ### Feature F-2.1 — Pydantic contracts
 
-- [x] **T-2.1.1** — `backend/schemas.py` mirrors [CLAUDE.md §2.3](CLAUDE.md#23-fastapi-search-schema) exactly. Includes `SearchQueryParams`, `MemeHit`, `LineageNode`, `SearchResponse`.
+- [x] **T-2.1.1** — `backend/schemas.py` mirrors [CLAUDE.md §2.3](CLAUDE.md#23-fastapi-search-schema) exactly. Includes `SearchQueryParams`, `MemeHit`, `LineageNode`, `SearchResponse`. ✅
   - Spec: [CLAUDE.md §2.3](CLAUDE.md#23-fastapi-search-schema)
   - Test: [TC-API-001](TESTS.md#4-live-ui-integration-tests)
 - [x] **T-2.1.2** — Weight validator (`model_validator`) ensures `visual_weight + irony_weight > 0`.
@@ -133,7 +133,7 @@ Goal: `/search` endpoint returns RRF-fused results with Neo4j lineage. The demo'
 
 ### Feature F-2.5 — RRF rank-shift validator
 
-- [ ] **T-2.5.1** — `scripts/rrf_sweep.py` hits `/search` with 5 weight pairs (1.0/0.0 → 0.0/1.0) and emits Jaccard matrix + JSON report.
+- [ ] **T-2.5.1** — `scripts/rrf_sweep.py` hits `/search` with 5 weight pairs (1.0/0.0 → 0.0/1.0) and emits Jaccard matrix + JSON report. ← NEXT
   - Spec: [README.md §4.4](README.md#44-validation-script-hook)
   - Test: [TC-DEMO-001](TESTS.md#2-vector-search-fusion-tests), [TC-DEMO-002](TESTS.md#2-vector-search-fusion-tests)
 - [ ] **T-2.5.2** — Exit code contract: 0 only if assertions in [README.md §4.3](README.md#43-rrf-validation-assertions) hold.

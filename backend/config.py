@@ -48,7 +48,7 @@ MISTRAL_CHAT_MODEL = os.getenv("MISTRAL_CHAT_MODEL", "mistral-large-latest")
 MISTRAL_EMBED_MODEL = os.getenv("MISTRAL_EMBED_MODEL", "mistral-embed")
 
 NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
+NEO4J_USER = os.getenv("NEO4J_USER") or os.getenv("NEO4J_USERNAME", "neo4j")
 NEO4J_PASSWORD = os.environ["NEO4J_PASSWORD"]
 
 COGNEE_LLM_API_KEY = os.getenv("COGNEE_LLM_API_KEY", "") or MISTRAL_API_KEY
