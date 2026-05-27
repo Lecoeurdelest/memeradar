@@ -1,20 +1,22 @@
 from __future__ import annotations
 
+import argparse
+import asyncio
 import json
-import time
-import uuid
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import sys
 from pathlib import Path
+from uuid import NAMESPACE_URL, uuid5
 
-from qdrant_client.models import PointStruct
-
-from . import clients as c
-from . import config as cfg
-
-
-def _public_url(image_path: str) -> str:
-    name = Path(image_path).name
-    return f"{cfg.PUBLIC_IMAGE_BASE}/{name}"
+from backend import config
+from backend.clients import (
+    close_all,
+    ensure_collection,
+    mistral_embed,
+    neo4j_upsert_meme,
+    qdrant_upsert_point,
+    tl_embed_image_file,
+)
+from backend.decoder import DecodeError, decode_meme, extract_text
 
 
 def _normalize_template(raw: str | None, title: str) -> str:
@@ -24,73 +26,126 @@ def _normalize_template(raw: str | None, title: str) -> str:
     return ("_".join(words) or "uncategorized")[:64]
 
 
-def process_one(meme: dict) -> dict | None:
-    try:
-        image_url = _public_url(meme["image_path"])
-        ocr_text = c.ocr_image(meme["image_path"])
-        irony = c.mistral_irony(meme["post_title"], ocr_text)
+async def ingest_one(
+    entry: dict,
+    semaphore: asyncio.Semaphore,
+    quarantine: list[dict],
+) -> bool:
+    async with semaphore:
+        reddit_id = entry["id"]
+        image_path = Path(entry["image_path"])
 
-        visual_vec = c.tl_image_embedding(image_url)
-        irony_vec = c.mistral_embed(irony)
+        if not image_path.exists():
+            quarantine.append({"id": reddit_id, "reason": "image_missing"})
+            return False
 
-        template = _normalize_template(meme.get("meme_template_name"), meme["post_title"])
+        ocr_text = await extract_text(image_path)
 
-        c.neo4j_upsert_meme(
-            meme_id=meme["id"],
-            template=template,
-            title=meme["post_title"],
-            upvotes=meme["upvotes"],
-            permalink=meme["permalink"],
-            irony=irony,
-            image_path=meme["image_path"],
+        try:
+            decoded, template_from_llm = await decode_meme(
+                title=entry["post_title"],
+                ocr_text=ocr_text,
+                subreddit=entry.get("source_subreddit", config.SUBREDDIT),
+            )
+        except DecodeError as e:
+            quarantine.append({"id": reddit_id, "reason": f"decode: {e}"})
+            return False
+
+        template = _normalize_template(
+            template_from_llm if template_from_llm != "unknown" else entry.get("meme_template_name"),
+            entry["post_title"],
         )
 
-        point = PointStruct(
-            id=str(uuid.uuid5(uuid.NAMESPACE_URL, meme["id"])),
-            vector={"visual": visual_vec, "irony": irony_vec},
+        try:
+            visual_vec = await tl_embed_image_file(image_path)
+        except Exception as e:
+            quarantine.append({"id": reddit_id, "reason": f"tl_embed: {e}"})
+            return False
+
+        try:
+            irony_vec = await mistral_embed(decoded.search_dense_explanations)
+        except Exception as e:
+            quarantine.append({"id": reddit_id, "reason": f"mistral_embed: {e}"})
+            return False
+
+        point_id = str(uuid5(NAMESPACE_URL, reddit_id))
+
+        await qdrant_upsert_point(
+            point_id=point_id,
+            visual_vec=visual_vec,
+            irony_vec=irony_vec,
             payload={
-                "reddit_id": meme["id"],
-                "title": meme["post_title"],
+                "reddit_id": reddit_id,
+                "title": entry["post_title"],
                 "ocr_text": ocr_text,
-                "irony": irony,
+                "image_url": entry["image_url"],
+                "permalink": entry["permalink"],
+                "upvotes": entry["upvotes"],
+                "source_subreddit": entry.get("source_subreddit", config.SUBREDDIT),
                 "template": template,
-                "upvotes": meme["upvotes"],
-                "permalink": meme["permalink"],
-                "image_url": image_url,
+                "core_joke": decoded.core_joke,
+                "psychological_state": decoded.psychological_state,
+                "subtext_context": decoded.subtext_context,
+                "search_dense_explanations": decoded.search_dense_explanations,
             },
         )
-        c.qdrant.upsert(collection_name=cfg.COLLECTION, points=[point])
-        return {"id": meme["id"], "ok": True}
-    except Exception as e:
-        return {"id": meme["id"], "ok": False, "error": str(e)}
+
+        await neo4j_upsert_meme(
+            meme_id=reddit_id,
+            template=template,
+            title=entry["post_title"],
+            upvotes=entry["upvotes"],
+            permalink=entry["permalink"],
+            core_joke=decoded.core_joke,
+            image_path=entry["image_path"],
+        )
+
+        return True
 
 
-def run(meta_file: Path = cfg.META_FILE, workers: int = 4, limit: int | None = None):
-    c.ensure_collection()
-    memes = json.loads(meta_file.read_text())
+async def run(workers: int, limit: int | None) -> None:
+    manifest_path = config.DATA_DIR / "memes.json"
+    if not manifest_path.exists():
+        print(f"No manifest found at {manifest_path}")
+        sys.exit(1)
+
+    entries = json.loads(manifest_path.read_text())
     if limit:
-        memes = memes[:limit]
+        entries = entries[:limit]
 
-    ok = fail = 0
-    t0 = time.time()
-    with ThreadPoolExecutor(max_workers=workers) as ex:
-        futures = [ex.submit(process_one, m) for m in memes]
-        for i, fut in enumerate(as_completed(futures), 1):
-            r = fut.result()
-            ok += int(r["ok"])
-            fail += int(not r["ok"])
-            if not r["ok"]:
-                print(f"  fail {r['id']}: {r['error']}")
-            if i % 25 == 0:
-                print(f"[{i}/{len(memes)}] ok={ok} fail={fail} elapsed={time.time()-t0:.0f}s")
+    print(f"Starting ingest: {len(entries)} memes, {workers} workers")
+    await ensure_collection()
 
-    print(f"done. ok={ok} fail={fail}")
+    semaphore = asyncio.Semaphore(workers)
+    quarantine: list[dict] = []
+
+    tasks = [ingest_one(entry, semaphore, quarantine) for entry in entries]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    ok = sum(1 for r in results if r is True)
+    errors = sum(1 for r in results if isinstance(r, Exception))
+
+    for i, r in enumerate(results):
+        if isinstance(r, Exception):
+            quarantine.append({"id": entries[i]["id"], "reason": str(r)})
+
+    if quarantine:
+        quarantine_path = config.DATA_DIR / "quarantine.json"
+        quarantine_path.write_text(json.dumps(quarantine, indent=2))
+        print(f"Quarantined {len(quarantine)} memes -> {quarantine_path}")
+
+    print(f"Ingest complete: {ok} ok, {len(quarantine)} quarantined, {errors} exceptions")
+
+    await close_all()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--limit", type=int, default=None)
+    args = parser.parse_args()
+    asyncio.run(run(args.workers, args.limit))
 
 
 if __name__ == "__main__":
-    import argparse
-    p = argparse.ArgumentParser()
-    p.add_argument("--limit", type=int, default=None)
-    p.add_argument("--workers", type=int, default=4)
-    args = p.parse_args()
-    run(workers=args.workers, limit=args.limit)
+    main()

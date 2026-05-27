@@ -1,0 +1,11 @@
+backend/.env
+data/images/
+data/memes.json
+data/quarantine.json
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+dist/
+.env
+mrvenv/

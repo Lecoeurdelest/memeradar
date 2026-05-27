@@ -3,14 +3,14 @@ from __future__ import annotations
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, model_validator
 
 
 class MemeDecodeSchema(BaseModel):
-    core_joke: str = Field(min_length=1, max_length=400)
-    psychological_state: str = Field(min_length=1, max_length=120)
-    subtext_context: str = Field(min_length=1, max_length=240)
-    search_dense_explanations: str = Field(min_length=40, max_length=800)
+    core_joke: str = Field(min_length=1, max_length=400, description="Central joke or humorous observation")
+    psychological_state: str = Field(min_length=1, max_length=120, description="Emotional or mental state depicted")
+    subtext_context: str = Field(min_length=1, max_length=240, description="Cultural or situational subtext")
+    search_dense_explanations: str = Field(min_length=40, max_length=800, description="Detailed searchable explanation")
 
 
 class QdrantPointPayload(BaseModel):
@@ -29,12 +29,18 @@ class QdrantPointPayload(BaseModel):
 
 
 class SearchQueryParams(BaseModel):
-    q: str = Field(min_length=1, max_length=400)
-    k: int = Field(default=20, ge=1, le=100)
-    visual_weight: float = Field(default=0.35, ge=0.0, le=1.0)
-    irony_weight: float = Field(default=0.65, ge=0.0, le=1.0)
-    template: str | None = None
-    psychological_state: str | None = None
+    q: str = Field(min_length=1, max_length=400, description="Search query text")
+    k: int = Field(default=20, ge=1, le=100, description="Number of results to return")
+    visual_weight: float = Field(default=0.35, ge=0.0, le=1.0, description="Visual similarity weight")
+    irony_weight: float = Field(default=0.65, ge=0.0, le=1.0, description="Irony/semantic similarity weight")
+    template: str | None = Field(default=None, description="Filter by meme template")
+    psychological_state: str | None = Field(default=None, description="Filter by psychological state")
+
+    @model_validator(mode="after")
+    def weights_must_sum_positive(self) -> SearchQueryParams:
+        if self.visual_weight + self.irony_weight <= 0:
+            raise ValueError("visual_weight + irony_weight must be greater than 0")
+        return self
 
 
 class LineageNode(BaseModel):

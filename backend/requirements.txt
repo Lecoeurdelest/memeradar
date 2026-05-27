@@ -1,21 +1,17 @@
-fastapi==0.115.4
-uvicorn[standard]==0.32.0
-python-dotenv==1.0.1
-pydantic==2.9.2
+fastapi>=0.115.4
+uvicorn[standard]>=0.30
+python-dotenv>=1.0
+pydantic>=2.9
+httpx>=0.27
 
-# Crawler
-praw==7.7.1
-requests==2.32.3
-beautifulsoup4==4.12.3
-Pillow==10.4.0
-pytesseract==0.3.13
+praw>=7.7
+requests>=2.31
+Pillow>=10.0
+pytesseract>=0.3.13
 
-# Vector + graph
-qdrant-client==1.12.1
-neo4j==5.25.0
+qdrant-client>=1.12
+neo4j>=5.20
 
-# Vendors
-twelvelabs==1.0.0
-mistralai==1.2.3
-superlinked==13.5.0
-cognee==0.1.41
+twelvelabs>=1.0.0
+mistralai>=1.2
+cognee>=0.1.41

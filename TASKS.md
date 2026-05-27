@@ -38,52 +38,52 @@ Goal: 1000 memes scraped, decoded, vectorized, and queryable in Qdrant + Neo4j.
 - [ ] **T-1.1.2** — Verify the same on a fresh Ubuntu 22.04 box.
   - Spec: [README.md §1.2](README.md#12-ubuntu-linux-apt)
   - Test: [TC-ENV-001](TESTS.md#1-pipeline-extraction-tests)
-- [ ] **T-1.1.3** — Author `.env.example` covering every key in the configuration matrix.
+- [x] **T-1.1.3** — Author `.env.example` covering every key in the configuration matrix.
   - Spec: [README.md §2](README.md#2-environment-configuration-interface), [CLAUDE.md §3.4](CLAUDE.md#34-configuration-loading)
   - Test: [TC-ENV-002](TESTS.md#1-pipeline-extraction-tests)
 
 ### Feature F-1.2 — Reddit crawler
 
-- [ ] **T-1.2.1** — Implement `scripts/crawl_reddit.py` with PRAW + checkpointing every 25 posts.
+- [x] **T-1.2.1** — Implement `scripts/crawl_reddit.py` with PRAW + checkpointing every 25 posts.
   - Spec: [CLAUDE.md §1](CLAUDE.md#1-repository-file-tree), [CLAUDE.md §3.3](CLAUDE.md#33-determinism--idempotency)
   - Test: [TC-CRAWL-001](TESTS.md#1-pipeline-extraction-tests), [TC-CRAWL-002](TESTS.md#1-pipeline-extraction-tests)
-- [ ] **T-1.2.2** — URL resolver covering `i.redd.it`, `imgur`, and Reddit preview fallback.
+- [x] **T-1.2.2** — URL resolver covering `i.redd.it`, `imgur`, and Reddit preview fallback.
   - Spec: [CLAUDE.md §1](CLAUDE.md#1-repository-file-tree)
   - Test: [TC-CRAWL-003](TESTS.md#1-pipeline-extraction-tests)
-- [ ] **T-1.2.3** — Filter NSFW, self-posts, and non-image submissions.
+- [x] **T-1.2.3** — Filter NSFW, self-posts, and non-image submissions.
   - Spec: [CLAUDE.md §1](CLAUDE.md#1-repository-file-tree)
   - Test: [TC-CRAWL-004](TESTS.md#1-pipeline-extraction-tests)
 
 ### Feature F-1.3 — Mistral structured decoder
 
-- [ ] **T-1.3.1** — Implement `backend/decoder.py` with JSON-mode prompt returning the four fields specified in [CLAUDE.md §2.1](CLAUDE.md#21-mistral-decoder-output-schema).
+- [x] **T-1.3.1** — Implement `backend/decoder.py` with JSON-mode prompt returning the four fields specified in [CLAUDE.md §2.1](CLAUDE.md#21-mistral-decoder-output-schema).
   - Spec: [CLAUDE.md §2.1](CLAUDE.md#21-mistral-decoder-output-schema)
   - Test: [TC-LLM-001](TESTS.md#1-pipeline-extraction-tests), [TC-LLM-002](TESTS.md#1-pipeline-extraction-tests), [TC-LLM-003](TESTS.md#1-pipeline-extraction-tests), [TC-LLM-004](TESTS.md#1-pipeline-extraction-tests)
-- [ ] **T-1.3.2** — Defensive JSON coercion: handle fenced output, prose-wrapped output, partial JSON.
+- [x] **T-1.3.2** — Defensive JSON coercion: handle fenced output, prose-wrapped output, partial JSON.
   - Spec: [CLAUDE.md §2.1 failure-mode contract](CLAUDE.md#21-mistral-decoder-output-schema)
   - Test: [TC-LLM-005](TESTS.md#1-pipeline-extraction-tests)
-- [ ] **T-1.3.3** — Tesseract OCR wrapper with graceful `(no text)` fallback.
+- [x] **T-1.3.3** — Tesseract OCR wrapper with graceful `(no text)` fallback.
   - Spec: [CLAUDE.md §2.1](CLAUDE.md#21-mistral-decoder-output-schema)
   - Test: [TC-OCR-001](TESTS.md#1-pipeline-extraction-tests), [TC-OCR-002](TESTS.md#1-pipeline-extraction-tests)
 
 ### Feature F-1.4 — Vector + graph upsert
 
-- [ ] **T-1.4.1** — `backend/clients.py::ensure_collection` materializes the named-vector schema and payload indexes from [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping).
+- [x] **T-1.4.1** — `backend/clients.py::ensure_collection` materializes the named-vector schema and payload indexes from [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping).
   - Spec: [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping)
   - Test: [TC-VEC-001](TESTS.md#2-vector-search-fusion-tests)
-- [ ] **T-1.4.2** — Deterministic `uuid5` point IDs; ingest is idempotent across reruns.
+- [x] **T-1.4.2** — Deterministic `uuid5` point IDs; ingest is idempotent across reruns.
   - Spec: [CLAUDE.md §3.3](CLAUDE.md#33-determinism--idempotency)
   - Test: [TC-VEC-002](TESTS.md#2-vector-search-fusion-tests)
-- [ ] **T-1.4.3** — Neo4j `(Meme)-[:USES_TEMPLATE]->(MemeTemplate)` `MERGE` upsert.
+- [x] **T-1.4.3** — Neo4j `(Meme)-[:USES_TEMPLATE]->(MemeTemplate)` `MERGE` upsert.
   - Spec: [CLAUDE.md §3.3](CLAUDE.md#33-determinism--idempotency)
   - Test: [TC-GRAPH-001](TESTS.md#3-graph-lineage-validation), [TC-GRAPH-003](TESTS.md#3-graph-lineage-validation)
-- [ ] **T-1.4.4** — Async ingestion loop with bounded semaphore per [CLAUDE.md §3.2](CLAUDE.md#32-async-processing-loops).
+- [x] **T-1.4.4** — Async ingestion loop with bounded semaphore per [CLAUDE.md §3.2](CLAUDE.md#32-async-processing-loops).
   - Spec: [CLAUDE.md §3.2](CLAUDE.md#32-async-processing-loops)
   - Test: [TC-DISC-002](TESTS.md#5-discipline--code-quality-gates), [TC-PERF-001](TESTS.md#5-discipline--code-quality-gates)
 
 ### Feature F-1.5 — Knowledge-graph enrichment
 
-- [ ] **T-1.5.1** — `backend/enrich_cognee.py` post-pass reading `search_dense_explanations` corpus.
+- [x] **T-1.5.1** — `backend/enrich_cognee.py` post-pass reading `search_dense_explanations` corpus.
   - Spec: [CLAUDE.md §1 endpoint inventory](CLAUDE.md#11-endpoint-inventory)
   - Test: [TC-GRAPH-002](TESTS.md#3-graph-lineage-validation), [TC-GRAPH-004](TESTS.md#3-graph-lineage-validation)
 
@@ -97,37 +97,37 @@ Goal: `/search` endpoint returns RRF-fused results with Neo4j lineage. The demo'
 
 ### Feature F-2.1 — Pydantic contracts
 
-- [ ] **T-2.1.1** — `backend/schemas.py` mirrors [CLAUDE.md §2.3](CLAUDE.md#23-fastapi-search-schema) exactly. Includes `SearchQueryParams`, `MemeHit`, `LineageNode`, `SearchResponse`.
+- [x] **T-2.1.1** — `backend/schemas.py` mirrors [CLAUDE.md §2.3](CLAUDE.md#23-fastapi-search-schema) exactly. Includes `SearchQueryParams`, `MemeHit`, `LineageNode`, `SearchResponse`.
   - Spec: [CLAUDE.md §2.3](CLAUDE.md#23-fastapi-search-schema)
   - Test: [TC-API-001](TESTS.md#4-live-ui-integration-tests)
-- [ ] **T-2.1.2** — Weight validator (`model_validator`) ensures `visual_weight + irony_weight > 0`.
+- [x] **T-2.1.2** — Weight validator (`model_validator`) ensures `visual_weight + irony_weight > 0`.
   - Spec: [CLAUDE.md §2.3 invariant 3](CLAUDE.md#23-fastapi-search-schema)
   - Test: [TC-API-002](TESTS.md#4-live-ui-integration-tests)
 
 ### Feature F-2.2 — Dual query embedding
 
-- [ ] **T-2.2.1** — Twelve Labs text embedding for visual-space query.
+- [x] **T-2.2.1** — Twelve Labs text embedding for visual-space query.
   - Spec: [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping)
   - Test: [TC-RRF-001](TESTS.md#2-vector-search-fusion-tests)
-- [ ] **T-2.2.2** — Mistral-embed for irony-space query.
+- [x] **T-2.2.2** — Mistral-embed for irony-space query.
   - Spec: [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping)
   - Test: [TC-RRF-002](TESTS.md#2-vector-search-fusion-tests)
 
 ### Feature F-2.3 — RRF fusion via Universal Query API
 
-- [ ] **T-2.3.1** — `backend/search.py` issues a single `query_points` with two prefetches and `FusionQuery(Fusion.RRF)`.
+- [x] **T-2.3.1** — `backend/search.py` issues a single `query_points` with two prefetches and `FusionQuery(Fusion.RRF)`.
   - Spec: [CLAUDE.md §2.3](CLAUDE.md#23-fastapi-search-schema)
   - Test: [TC-RRF-003](TESTS.md#2-vector-search-fusion-tests), [TC-RRF-004](TESTS.md#2-vector-search-fusion-tests)
-- [ ] **T-2.3.2** — Weight-to-candidate-count translation function. Document the formula in `search.py` as a constant — no inline comment per [CLAUDE.md §3.1](CLAUDE.md#31-comment--docstring-prohibition-application-code).
+- [x] **T-2.3.2** — Weight-to-candidate-count translation function. Document the formula in `search.py` as a constant — no inline comment per [CLAUDE.md §3.1](CLAUDE.md#31-comment--docstring-prohibition-application-code).
   - Spec: [CLAUDE.md §3.1](CLAUDE.md#31-comment--docstring-prohibition-application-code)
   - Test: [TC-RRF-005](TESTS.md#2-vector-search-fusion-tests), [TC-RRF-006](TESTS.md#2-vector-search-fusion-tests)
-- [ ] **T-2.3.3** — Empty-result safety: returns `count: 0, results: []` not 404.
+- [x] **T-2.3.3** — Empty-result safety: returns `count: 0, results: []` not 404.
   - Spec: [CLAUDE.md §2.3 invariant 4](CLAUDE.md#23-fastapi-search-schema)
   - Test: [TC-RRF-007](TESTS.md#2-vector-search-fusion-tests)
 
 ### Feature F-2.4 — Lineage join
 
-- [ ] **T-2.4.1** — Per-result Neo4j Cypher `MATCH (m:Meme {id: $id})-[:USES_TEMPLATE]->(t)-[:VARIATION_OF*0..2]-(sib)` returning `LineageNode`.
+- [x] **T-2.4.1** — Per-result Neo4j Cypher `MATCH (m:Meme {id: $id})-[:USES_TEMPLATE]->(t)-[:VARIATION_OF*0..2]-(sib)` returning `LineageNode`.
   - Spec: [CLAUDE.md §2.3 MemeHit.lineage](CLAUDE.md#23-fastapi-search-schema)
   - Test: [TC-GRAPH-002](TESTS.md#3-graph-lineage-validation), [TC-GRAPH-005](TESTS.md#3-graph-lineage-validation)
 

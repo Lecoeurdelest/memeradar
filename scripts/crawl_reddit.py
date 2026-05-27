@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 import re
 import time
 from pathlib import Path
@@ -9,107 +8,153 @@ from urllib.parse import urlparse
 
 import praw
 import requests
-from dotenv import load_dotenv
 
-load_dotenv()
+from backend import config
 
-SUBREDDIT = os.getenv("SUBREDDIT", "memes")
-TIME_FILTER = os.getenv("TIME_FILTER", "year")
-LIMIT = int(os.getenv("LIMIT", "1000"))
 
-OUT_DIR = Path("data")
-IMG_DIR = OUT_DIR / "images"
-META_FILE = OUT_DIR / "memes.json"
-IMG_DIR.mkdir(parents=True, exist_ok=True)
+CHECKPOINT_INTERVAL = 25
+MANIFEST_PATH = config.DATA_DIR / "memes.json"
+IMAGES_DIR = config.DATA_DIR / "images"
 
-VALID_EXT = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+VALID_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 
-reddit = praw.Reddit(
-    client_id=os.environ["REDDIT_CLIENT_ID"],
-    client_secret=os.environ["REDDIT_CLIENT_SECRET"],
-    user_agent=os.environ.get("REDDIT_USER_AGENT", "memeradar/0.1"),
-)
+
+def load_manifest() -> list[dict]:
+    if MANIFEST_PATH.exists():
+        return json.loads(MANIFEST_PATH.read_text())
+    return []
+
+
+def save_manifest(entries: list[dict]) -> None:
+    MANIFEST_PATH.write_text(json.dumps(entries, indent=2))
 
 
 def safe_ext(url: str) -> str | None:
     path = urlparse(url).path.lower()
-    for ext in VALID_EXT:
+    for ext in VALID_EXTENSIONS:
         if path.endswith(ext):
             return ext
     return None
 
 
-def resolve_direct_url(post) -> str | None:
-    url = post.url
+def resolve_image_url(submission) -> str | None:
+    url = submission.url
+
     if safe_ext(url):
         return url
-    if "i.redd.it" in url or "i.imgur.com" in url:
+
+    parsed = urlparse(url)
+
+    if parsed.hostname in ("i.redd.it", "i.imgur.com"):
         return url
-    if hasattr(post, "preview"):
+
+    if parsed.hostname in ("imgur.com",):
+        imgur_id = Path(parsed.path).stem
+        return f"https://i.imgur.com/{imgur_id}.jpg"
+
+    if hasattr(submission, "preview") and submission.preview:
         try:
-            return post.preview["images"][0]["source"]["url"].replace("&amp;", "&")
+            return submission.preview["images"][0]["source"]["url"].replace("&amp;", "&")
         except (KeyError, IndexError, AttributeError):
             return None
+
     return None
 
 
-def slug(text: str, n: int = 60) -> str:
-    s = re.sub(r"[^a-zA-Z0-9_-]+", "_", text)[:n].strip("_")
+def is_valid_submission(submission) -> bool:
+    if submission.over_18:
+        return False
+    if submission.is_self:
+        return False
+    if submission.is_video:
+        return False
+    if not submission.url:
+        return False
+    return True
+
+
+def download_image(url: str, filename: str) -> Path | None:
+    dest = IMAGES_DIR / filename
+    if dest.exists():
+        return dest
+    try:
+        resp = requests.get(
+            url,
+            timeout=20,
+            headers={"User-Agent": config.REDDIT_USER_AGENT},
+        )
+        resp.raise_for_status()
+        content_type = resp.headers.get("content-type", "")
+        if "image" not in content_type and "octet-stream" not in content_type:
+            return None
+        dest.write_bytes(resp.content)
+        return dest
+    except Exception:
+        return None
+
+
+def slugify(text: str, max_len: int = 40) -> str:
+    s = re.sub(r"[^a-zA-Z0-9_-]+", "_", text)[:max_len].strip("_")
     return s or "untitled"
 
 
-def download(url: str, dest: Path) -> bool:
-    try:
-        r = requests.get(url, timeout=20, headers={"User-Agent": "memeradar/0.1"})
-        r.raise_for_status()
-        dest.write_bytes(r.content)
-        return True
-    except Exception as e:
-        print(f"  download failed: {e}")
-        return False
+def crawl() -> None:
+    reddit = praw.Reddit(
+        client_id=config.REDDIT_CLIENT_ID,
+        client_secret=config.REDDIT_CLIENT_SECRET,
+        user_agent=config.REDDIT_USER_AGENT,
+    )
 
+    existing = load_manifest()
+    seen_ids = {e["id"] for e in existing}
+    entries = list(existing)
+    new_count = 0
 
-def main():
-    sub = reddit.subreddit(SUBREDDIT)
-    records = []
-    seen = set()
+    subreddit = reddit.subreddit(config.SUBREDDIT)
 
-    for i, post in enumerate(sub.top(time_filter=TIME_FILTER, limit=LIMIT)):
-        if post.id in seen or post.over_18 or post.is_self:
+    for submission in subreddit.top(time_filter=config.TIME_FILTER, limit=config.LIMIT):
+        if submission.id in seen_ids:
             continue
-        seen.add(post.id)
 
-        url = resolve_direct_url(post)
-        if not url:
+        if not is_valid_submission(submission):
             continue
-        ext = safe_ext(url) or ".jpg"
-        fname = f"{post.id}_{slug(post.title, 40)}{ext}"
-        fpath = IMG_DIR / fname
 
-        if not fpath.exists():
-            if not download(url, fpath):
-                continue
-            time.sleep(0.3)
+        image_url = resolve_image_url(submission)
+        if not image_url:
+            continue
 
-        records.append({
-            "id": post.id,
-            "image_path": str(fpath.resolve()),
-            "post_title": post.title,
-            "upvotes": post.score,
-            "num_comments": post.num_comments,
-            "meme_template_name": (post.link_flair_text or "").strip() or None,
-            "permalink": f"https://reddit.com{post.permalink}",
-            "created_utc": post.created_utc,
-            "source_url": url,
-        })
+        ext = safe_ext(image_url) or ".jpg"
+        filename = f"{submission.id}_{slugify(submission.title)}{ext}"
 
-        if (i + 1) % 25 == 0:
-            META_FILE.write_text(json.dumps(records, indent=2))
-            print(f"[{len(records)}] checkpointed")
+        local_path = download_image(image_url, filename)
+        if not local_path:
+            continue
 
-    META_FILE.write_text(json.dumps(records, indent=2))
-    print(f"done. {len(records)} memes -> {META_FILE}")
+        entry = {
+            "id": submission.id,
+            "post_title": submission.title,
+            "image_url": image_url,
+            "image_path": str(local_path),
+            "permalink": f"https://reddit.com{submission.permalink}",
+            "upvotes": submission.score,
+            "source_subreddit": config.SUBREDDIT,
+            "meme_template_name": (submission.link_flair_text or "").strip() or None,
+            "created_utc": submission.created_utc,
+        }
+
+        entries.append(entry)
+        seen_ids.add(submission.id)
+        new_count += 1
+
+        if new_count % CHECKPOINT_INTERVAL == 0:
+            save_manifest(entries)
+            print(f"Checkpoint: {len(entries)} total, {new_count} new")
+
+        time.sleep(0.3)
+
+    save_manifest(entries)
+    print(f"Done: {len(entries)} total, {new_count} new")
 
 
 if __name__ == "__main__":
-    main()
+    crawl()
