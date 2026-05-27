@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend import config
@@ -31,6 +33,8 @@ app.add_middleware(
 images_dir = config.DATA_DIR / "images"
 if images_dir.exists():
     app.mount("/static/images", StaticFiles(directory=str(images_dir)), name="images")
+
+_FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
 
 
 @app.get("/health")
@@ -65,3 +69,12 @@ async def search_endpoint(
         weights={"visual": w.visual, "irony": w.irony},
         results=results,
     )
+
+
+# Serve frontend SPA — must be last
+if _FRONTEND_DIST.exists():
+    app.mount("/assets", StaticFiles(directory=str(_FRONTEND_DIST / "assets")), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def spa_fallback(full_path: str):
+        return FileResponse(str(_FRONTEND_DIST / "index.html"))

@@ -1,6 +1,4 @@
-const API = typeof import.meta !== 'undefined' && import.meta.env?.VITE_API
-  ? import.meta.env.VITE_API
-  : 'http://localhost:8000'
+const API = import.meta.env.VITE_API || 'http://localhost:8000'
 
 export async function searchMemes({ q, k = 24, visualWeight = 0.35, ironyWeight = 0.65, template = null }) {
   const params = new URLSearchParams({
