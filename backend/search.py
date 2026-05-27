@@ -1,21 +1,3 @@
-"""Phase 3 — query-time multi-space fusion.
-
-Why this layout: the hackathon brief mandates Superlinked for "vector fusion and
-weighting." Superlinked's mental model is *multiple typed spaces, each weighted at
-query time*. We mirror that contract by:
-
-  - declaring two named spaces in Qdrant (`visual` = Twelve Labs / Marengo,
-    `irony`  = Mistral-embed),
-  - using Qdrant's Universal Query API (`query_points` + `prefetch`) to fan out
-    one weighted sub-query per space, and
-  - fusing with Reciprocal Rank Fusion (RRF).
-
-Reasoning for weights: judges typically type text like "absolute panic when
-production crashes". That signal is overwhelmingly *semantic* (the irony space),
-but the visual space still helps anchor on facial-expression memes like Drake/
-Distracted Boyfriend. Default split is 0.35 visual / 0.65 irony, exposed via the
-API so the demo can show the slider live.
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -39,9 +21,6 @@ class Weights:
 
 
 def _candidates_per_space(weight: float, k: int) -> int:
-    """Translate a continuous weight into a discrete prefetch limit.
-    Higher weight => pull more candidates from that space before RRF fuses ranks.
-    """
     return max(5, int(k * 4 * weight))
 
 
@@ -49,8 +28,6 @@ def search(query: str, k: int = 20, weights: Weights | None = None,
            template_filter: str | None = None) -> list[dict]:
     w = (weights or Weights()).normalized()
 
-    # Embed the query into BOTH spaces.
-    # Marengo is multimodal — text-from-Marengo lives in the SAME space as the image vectors.
     visual_q = c.tl_text_embedding(query)
     irony_q = c.mistral_embed(query)
 

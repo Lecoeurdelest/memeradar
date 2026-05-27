@@ -1,4 +1,3 @@
-"""Scrape latest Know Your Meme entries with image, About, and Origin data."""
 from __future__ import annotations
 
 import argparse

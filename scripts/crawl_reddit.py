@@ -1,4 +1,3 @@
-"""Phase 1 — scrape top posts from a meme subreddit and save metadata + media."""
 from __future__ import annotations
 
 import json
@@ -90,7 +89,7 @@ def main():
         if not fpath.exists():
             if not download(url, fpath):
                 continue
-            time.sleep(0.3)  # gentle on Reddit's CDN
+            time.sleep(0.3)
 
         records.append({
             "id": post.id,

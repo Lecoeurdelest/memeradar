@@ -1,4 +1,3 @@
-"""FastAPI entrypoint."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -19,7 +18,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve scraped images so the frontend (and Twelve Labs during ingest) can fetch them.
 images_dir = cfg.DATA_DIR / "images"
 if images_dir.exists():
     app.mount("/static/images", StaticFiles(directory=str(images_dir)), name="images")

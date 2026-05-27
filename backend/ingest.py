@@ -1,4 +1,3 @@
-"""Phase 2 — ingest each scraped meme: OCR -> Mistral irony -> TL embed -> Neo4j -> Qdrant."""
 from __future__ import annotations
 
 import json
@@ -14,16 +13,13 @@ from . import config as cfg
 
 
 def _public_url(image_path: str) -> str:
-    """Translate a local file path to a URL that Twelve Labs can fetch."""
     name = Path(image_path).name
     return f"{cfg.PUBLIC_IMAGE_BASE}/{name}"
 
 
 def _normalize_template(raw: str | None, title: str) -> str:
-    """Reddit flair is messy. Fallback to a stable bucket if missing."""
     if raw:
         return raw.strip().lower().replace(" ", "_")[:64]
-    # crude fallback: first 3 lowercase words of title
     words = [w for w in title.lower().split() if w.isalpha()][:3]
     return ("_".join(words) or "uncategorized")[:64]
 
