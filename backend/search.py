@@ -92,9 +92,21 @@ async def search(
 
 
 async def _embed_query(query: str) -> tuple[list[float], list[float]]:
+    import asyncio
     visual_q = await tl_embed_text(query)
-    irony_q = await mistral_embed(query)
-    return visual_q, irony_q
+    delays = [2, 5, 10, 20]
+    last_exc: Exception | None = None
+    for attempt, delay in enumerate([0] + delays):
+        if delay:
+            await asyncio.sleep(delay)
+        try:
+            irony_q = await mistral_embed(query)
+            return visual_q, irony_q
+        except Exception as exc:
+            last_exc = exc
+            if "429" not in str(exc):
+                raise
+    raise last_exc  # type: ignore
 
 
 def _build_filter(
