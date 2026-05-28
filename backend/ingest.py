@@ -24,6 +24,7 @@ from backend.clients import (
     close_all,
     ensure_collection,
     mistral_embed,
+    neo4j_upsert_caption,
     neo4j_upsert_meme,
     qdrant_upsert_point,
     tl_embed_image_file,
@@ -115,6 +116,15 @@ async def ingest_one(
             permalink=entry["permalink"],
             core_joke=decoded.core_joke,
             image_path=entry["image_path"],
+        )
+
+        await neo4j_upsert_caption(
+            meme_id=reddit_id,
+            lang="en",
+            core_joke=decoded.core_joke,
+            psychological_state=decoded.psychological_state,
+            subtext_context=decoded.subtext_context,
+            search_dense_explanations=decoded.search_dense_explanations,
         )
 
         return True

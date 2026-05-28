@@ -79,16 +79,34 @@ async def run(langs: list[str], delay: float, limit: int | None) -> None:
         ok = skipped = errors = 0
         for i, payload in enumerate(payloads):
             meme_id = payload.get("reddit_id", f"#{i}")
+            status = "error"
             try:
-                status = await translate_one(payload, lang, delay)
-                if status == "ok":
-                    ok += 1
+                if lang == "en":
+                    if await already_translated(meme_id, "en"):
+                        status = "skip:exists"
+                        skipped += 1
+                    else:
+                        await neo4j_upsert_caption(
+                            meme_id=meme_id,
+                            lang="en",
+                            core_joke=payload.get("core_joke", ""),
+                            psychological_state=payload.get("psychological_state", ""),
+                            subtext_context=payload.get("subtext_context", ""),
+                            search_dense_explanations=payload.get("search_dense_explanations", ""),
+                        )
+                        status = "ok"
+                        ok += 1
                 else:
-                    skipped += 1
+                    status = await translate_one(payload, lang, delay)
+                    if status == "ok":
+                        ok += 1
+                    else:
+                        skipped += 1
             except Exception as e:
                 errors += 1
+                status = "error"
                 print(f"  ERROR [{lang}] {meme_id}: {e}")
-            print(f"  [{lang_name}] {i+1}/{len(payloads)} {meme_id} -> {status if 'status' in dir() else 'error'}")
+            print(f"  [{lang_name}] {i+1}/{len(payloads)} {meme_id} -> {status}")
 
         print(f"[{lang_name}] done — ok={ok} skipped={skipped} errors={errors}")
 
