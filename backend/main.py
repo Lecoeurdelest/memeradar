@@ -50,6 +50,7 @@ async def search_endpoint(
     irony_weight: float = Query(0.65, ge=0.0, le=1.0),
     template: str | None = Query(None),
     psychological_state: str | None = Query(None),
+    lang: str = Query("en", pattern="^(en|es|fr|ja|pt|vi)$"),
 ):
     if visual_weight + irony_weight <= 0:
         from fastapi import HTTPException
@@ -61,6 +62,7 @@ async def search_endpoint(
         weights=Weights(visual=visual_weight, irony=irony_weight),
         template_filter=template,
         psychological_state_filter=psychological_state,
+        lang=lang,
     )
 
     return SearchResponse(

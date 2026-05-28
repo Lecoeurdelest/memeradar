@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
-import { searchMemes } from './api.js'
+import { useState, useRef } from 'react'
+import { searchMemes, LANGUAGES } from './api.js'
 import './App.css'
 
 export default function App() {
@@ -8,6 +8,7 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState(null)
   const [visual, setVisual] = useState(0.35)
+  const [lang, setLang] = useState('en')
   const [active, setActive] = useState(null)
   const debounceRef = useRef(null)
   const lastQuery = useRef('')
@@ -19,13 +20,13 @@ export default function App() {
     setTimeout(() => setToast(null), 4000)
   }
 
-  async function go(visualVal, queryVal) {
+  async function go(visualVal, queryVal, langVal) {
     const qTrimmed = (queryVal ?? q).trim()
     if (!qTrimmed) return
     lastQuery.current = qTrimmed
     setLoading(true)
     try {
-      const data = await searchMemes({ q: qTrimmed, k: 24, visualWeight: visualVal ?? visual, ironyWeight: +(1 - (visualVal ?? visual)).toFixed(2) })
+      const data = await searchMemes({ q: qTrimmed, k: 24, visualWeight: visualVal ?? visual, ironyWeight: +(1 - (visualVal ?? visual)).toFixed(2), lang: langVal ?? lang })
       setResults(data.results || [])
     } catch (err) {
       showToast('Search failed — backend error. Try again.')
@@ -76,6 +77,16 @@ export default function App() {
           />
           irony <b>{irony.toFixed(2)}</b>
         </label>
+      </div>
+
+      <div className="lang-picker">
+        {Object.entries(LANGUAGES).map(([code, label]) => (
+          <button
+            key={code}
+            className={`lang-btn${lang === code ? ' active' : ''}`}
+            onClick={() => { setLang(code); if (lastQuery.current) go(visual, lastQuery.current, code) }}
+          >{label}</button>
+        ))}
       </div>
 
       {results !== null && results.length === 0 && (

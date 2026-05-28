@@ -35,6 +35,7 @@ class SearchQueryParams(BaseModel):
     irony_weight: float = Field(default=0.65, ge=0.0, le=1.0, description="Irony/semantic similarity weight")
     template: str | None = Field(default=None, description="Filter by meme template")
     psychological_state: str | None = Field(default=None, description="Filter by psychological state")
+    lang: str = Field(default="en", description="Caption language: en, es, fr, ja, pt")
 
     @model_validator(mode="after")
     def weights_must_sum_positive(self) -> SearchQueryParams:
@@ -59,6 +60,7 @@ class MemeHit(BaseModel):
     core_joke: str
     psychological_state: str
     subtext_context: str
+    lang: str = "en"
     lineage: LineageNode
 
 

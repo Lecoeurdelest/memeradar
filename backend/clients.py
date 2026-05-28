@@ -192,6 +192,58 @@ async def neo4j_merge_variation(template_a: str, template_b: str) -> None:
         await result.consume()
 
 
+async def neo4j_upsert_caption(
+    meme_id: str,
+    lang: str,
+    core_joke: str,
+    psychological_state: str,
+    subtext_context: str,
+    search_dense_explanations: str,
+) -> None:
+    driver = get_neo4j_driver()
+    query = (
+        "MATCH (m:Meme {id: $meme_id}) "
+        "MERGE (c:MemeCaption {meme_id: $meme_id, lang: $lang}) "
+        "SET c.core_joke = $core_joke, "
+        "    c.psychological_state = $psychological_state, "
+        "    c.subtext_context = $subtext_context, "
+        "    c.search_dense_explanations = $search_dense_explanations, "
+        "    c.updated_at = timestamp() "
+        "MERGE (m)-[:HAS_CAPTION]->(c)"
+    )
+    async with driver.session() as session:
+        result = await session.run(
+            query,
+            meme_id=meme_id,
+            lang=lang,
+            core_joke=core_joke,
+            psychological_state=psychological_state,
+            subtext_context=subtext_context,
+            search_dense_explanations=search_dense_explanations,
+        )
+        await result.consume()
+
+
+async def neo4j_get_caption(meme_id: str, lang: str) -> dict | None:
+    driver = get_neo4j_driver()
+    query = (
+        "MATCH (m:Meme {id: $meme_id})-[:HAS_CAPTION]->(c:MemeCaption {lang: $lang}) "
+        "RETURN c.core_joke AS core_joke, "
+        "       c.psychological_state AS psychological_state, "
+        "       c.subtext_context AS subtext_context"
+    )
+    async with driver.session() as session:
+        result = await session.run(query, meme_id=meme_id, lang=lang)
+        record = await result.single()
+        if not record:
+            return None
+        return {
+            "core_joke": record["core_joke"],
+            "psychological_state": record["psychological_state"],
+            "subtext_context": record["subtext_context"],
+        }
+
+
 async def neo4j_lineage(meme_id: str) -> dict:
     driver = get_neo4j_driver()
     query = (

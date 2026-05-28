@@ -74,3 +74,14 @@ header p { color: var(--muted); margin: 4px 0 24px; }
   background: #ff3d7f; color: #fff; padding: 12px 24px; border-radius: 8px;
   font-size: 14px; z-index: 100; box-shadow: 0 4px 24px rgba(0,0,0,.5);
 }
+
+.lang-picker {
+  display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap;
+}
+.lang-btn {
+  padding: 6px 14px; border-radius: 20px; border: 1px solid #25252f;
+  background: transparent; color: var(--muted); cursor: pointer; font-size: 13px;
+  transition: all .15s;
+}
+.lang-btn:hover { border-color: var(--accent); color: var(--fg); }
+.lang-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
