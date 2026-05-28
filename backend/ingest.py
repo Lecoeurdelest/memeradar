@@ -140,20 +140,30 @@ async def run(workers: int, limit: int | None, delay: float) -> None:
     if limit:
         entries = entries[:limit]
 
-    print(f"Starting ingest: {len(entries)} memes, {workers} workers, {delay}s inter-item delay")
+    total = len(entries)
+    print(f"Starting ingest: {total} memes, {workers} workers, {delay}s launch stagger")
     await ensure_collection()
 
     semaphore = asyncio.Semaphore(workers)
     quarantine: list[dict] = []
-    ok = 0
+    progress = {"done": 0, "ok": 0}
 
-    for i, entry in enumerate(entries):
+    async def _worker(entry: dict) -> bool:
         result = await ingest_one(entry, semaphore, quarantine)
+        progress["done"] += 1
         if result is True:
-            ok += 1
-        print(f"[{i+1}/{len(entries)}] {entry['id']} -> {'ok' if result else 'quarantined'}")
-        if delay > 0 and i < len(entries) - 1:
+            progress["ok"] += 1
+        print(f"[{progress['done']}/{total}] {entry['id']} -> {'ok' if result else 'quarantined'}")
+        return result
+
+    tasks = []
+    for entry in entries:
+        tasks.append(asyncio.create_task(_worker(entry)))
+        if delay > 0:
             await asyncio.sleep(delay)
+    await asyncio.gather(*tasks)
+
+    ok = progress["ok"]
 
     if quarantine:
         quarantine_path = config.DATA_DIR / "quarantine.json"
@@ -169,7 +179,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--delay", type=float, default=2.0)
+    parser.add_argument("--delay", type=float, default=0.0)
     args = parser.parse_args()
     asyncio.run(run(args.workers, args.limit, args.delay))
 

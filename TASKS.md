@@ -190,7 +190,7 @@ Goal: judges can use the system. Demo video can be recorded.
 
 ## Sprint 4 — Multilingual Support
 
-Goal: captions for all 100 memes translated into ES, FR, JA, PT and stored in Neo4j. The `/search` endpoint accepts `lang` and returns translated captions. UI has a language picker.
+Goal: captions for every ingested meme translated into ES, FR, JA, PT, VI and stored in Neo4j. The `/search` endpoint accepts `lang` and returns translated captions. UI has a language picker.
 
 **Supported languages**: `en` English · `es` Spanish · `fr` French · `ja` Japanese · `pt` Portuguese · `vi` Vietnamese
 
@@ -201,26 +201,26 @@ Goal: captions for all 100 memes translated into ES, FR, JA, PT and stored in Ne
 
 ### Feature F-4.1 — Translation module
 
-- [x] **T-4.1.1** — `backend/translate.py` with `translate_caption(fields, target_lang)` using Mistral chat JSON-mode. Supports `SUPPORTED_LANGUAGES = {en, es, fr, ja, pt}`. ✅
+- [x] **T-4.1.1** — `backend/translate.py` with `translate_caption(fields, target_lang)` using Mistral chat JSON-mode. Supports `SUPPORTED_LANGUAGES = {en, es, fr, ja, pt, vi}`. ✅
 - [x] **T-4.1.2** — `backend/clients.py` gains `neo4j_upsert_caption(meme_id, lang, ...)` and `neo4j_get_caption(meme_id, lang)`. ✅
   - Graph model: `(m:Meme)-[:HAS_CAPTION]->(c:MemeCaption {lang, core_joke, psychological_state, subtext_context, search_dense_explanations})`
 
 ### Feature F-4.2 — Batch translation script
 
 - [ ] **T-4.2.1** — `scripts/translate_captions.py` scrolls all Qdrant payloads, calls Mistral for each meme × language, upserts into Neo4j. Idempotent (skips already-translated nodes). Includes 429 retry backoff.
-  - Run: `python scripts/translate_captions.py --langs es fr ja pt --delay 1.5`
-- [ ] **T-4.2.2** — Verify all 100 memes have captions for all 4 non-English languages in Neo4j.
-  - Check: Neo4j node count `MATCH (c:MemeCaption) RETURN c.lang, count(c)` → 100 per lang.
+  - Run: `python scripts/translate_captions.py --langs es fr ja pt vi --delay 1.5`
+- [ ] **T-4.2.2** — Verify every ingested meme has captions for all 5 non-English languages in Neo4j.
+  - Check: Neo4j node count `MATCH (c:MemeCaption) RETURN c.lang, count(c)` → one row per lang, equal to the ingested meme count.
 
 ### Feature F-4.3 — Multilingual search endpoint
 
-- [x] **T-4.3.1** — `/search` accepts `lang` query param (`en|es|fr|ja|pt`, default `en`). ✅
+- [x] **T-4.3.1** — `/search` accepts `lang` query param (`en|es|fr|ja|pt|vi`, default `en`). ✅
 - [x] **T-4.3.2** — When `lang != en` and translation exists in Neo4j, response `core_joke`, `psychological_state`, `subtext_context` are the translated values; falls back to English if not yet translated. ✅
 - [x] **T-4.3.3** — `MemeHit` schema gains `lang: str` field. ✅
 
 ### Feature F-4.4 — Language picker UI
 
-- [x] **T-4.4.1** — Language picker pill buttons (🇺🇸 🇪🇸 🇫🇷 🇯🇵 🇧🇷) in the UI; switching re-fetches with new `lang` param. ✅
+- [x] **T-4.4.1** — Language picker pill buttons (🇺🇸 🇪🇸 🇫🇷 🇯🇵 🇧🇷 🇻🇳) in the UI; switching re-fetches with new `lang` param. ✅
 - [x] **T-4.4.2** — Modal captions reflect the selected language. ✅
 
 **Sprint 4 exit criteria**: `python scripts/translate_captions.py` completes without error; `curl /search?q=cat&lang=ja` returns Japanese captions; UI language picker switches captions live.

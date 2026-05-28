@@ -9,7 +9,13 @@ from backend import config
 from backend.clients import close_all, neo4j_merge_variation, scroll_all_payloads
 
 
+os.environ.setdefault("LLM_PROVIDER", "mistral")
+os.environ.setdefault("LLM_MODEL", config.MISTRAL_CHAT_MODEL)
 os.environ["LLM_API_KEY"] = config.COGNEE_LLM_API_KEY
+os.environ.setdefault("EMBEDDING_PROVIDER", "mistral")
+os.environ.setdefault("EMBEDDING_MODEL", config.MISTRAL_EMBED_MODEL)
+os.environ.setdefault("EMBEDDING_DIMENSIONS", "1024")
+os.environ.setdefault("EMBEDDING_API_KEY", config.COGNEE_LLM_API_KEY)
 
 
 async def build_corpus() -> tuple[str, list[str]]:

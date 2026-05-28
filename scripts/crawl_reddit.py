@@ -112,48 +112,49 @@ def crawl() -> None:
 
     subreddit = reddit.subreddit(config.SUBREDDIT)
 
-    for submission in subreddit.top(time_filter=config.TIME_FILTER, limit=config.LIMIT):
-        if submission.id in seen_ids:
-            continue
+    try:
+        for submission in subreddit.top(time_filter=config.TIME_FILTER, limit=config.LIMIT):
+            if submission.id in seen_ids:
+                continue
 
-        if not is_valid_submission(submission):
-            continue
+            if not is_valid_submission(submission):
+                continue
 
-        image_url = resolve_image_url(submission)
-        if not image_url:
-            continue
+            image_url = resolve_image_url(submission)
+            if not image_url:
+                continue
 
-        ext = safe_ext(image_url) or ".jpg"
-        filename = f"{submission.id}_{slugify(submission.title)}{ext}"
+            ext = safe_ext(image_url) or ".jpg"
+            filename = f"{submission.id}_{slugify(submission.title)}{ext}"
 
-        local_path = download_image(image_url, filename)
-        if not local_path:
-            continue
+            local_path = download_image(image_url, filename)
+            if not local_path:
+                continue
 
-        entry = {
-            "id": submission.id,
-            "post_title": submission.title,
-            "image_url": image_url,
-            "image_path": str(local_path),
-            "permalink": f"https://reddit.com{submission.permalink}",
-            "upvotes": submission.score,
-            "source_subreddit": config.SUBREDDIT,
-            "meme_template_name": (submission.link_flair_text or "").strip() or None,
-            "created_utc": submission.created_utc,
-        }
+            entry = {
+                "id": submission.id,
+                "post_title": submission.title,
+                "image_url": image_url,
+                "image_path": str(local_path),
+                "permalink": f"https://reddit.com{submission.permalink}",
+                "upvotes": submission.score,
+                "source_subreddit": config.SUBREDDIT,
+                "meme_template_name": (submission.link_flair_text or "").strip() or None,
+                "created_utc": submission.created_utc,
+            }
 
-        entries.append(entry)
-        seen_ids.add(submission.id)
-        new_count += 1
+            entries.append(entry)
+            seen_ids.add(submission.id)
+            new_count += 1
 
-        if new_count % CHECKPOINT_INTERVAL == 0:
-            save_manifest(entries)
-            print(f"Checkpoint: {len(entries)} total, {new_count} new")
+            if new_count % CHECKPOINT_INTERVAL == 0:
+                save_manifest(entries)
+                print(f"Checkpoint: {len(entries)} total, {new_count} new")
 
-        time.sleep(0.3)
-
-    save_manifest(entries)
-    print(f"Done: {len(entries)} total, {new_count} new")
+            time.sleep(0.3)
+    finally:
+        save_manifest(entries)
+        print(f"Saved: {len(entries)} total, {new_count} new")
 
 
 if __name__ == "__main__":

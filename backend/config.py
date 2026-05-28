@@ -54,7 +54,6 @@ NEO4J_PASSWORD = os.environ["NEO4J_PASSWORD"]
 COGNEE_LLM_API_KEY = os.getenv("COGNEE_LLM_API_KEY", "") or MISTRAL_API_KEY
 
 DATA_DIR = Path(os.getenv("DATA_DIR", "./data"))
-PUBLIC_IMAGE_BASE = os.getenv("PUBLIC_IMAGE_BASE", "http://localhost:8000/static/images")
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 (DATA_DIR / "images").mkdir(parents=True, exist_ok=True)

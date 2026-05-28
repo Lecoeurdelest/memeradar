@@ -72,24 +72,23 @@ Single source of truth lives in `backend/.env`. Schema is enforced at boot by `b
 |---|---|---|---|---|
 | `REDDIT_CLIENT_ID` | yes | — | Reddit OAuth app ID | `scripts/crawl_reddit.py` |
 | `REDDIT_CLIENT_SECRET` | yes | — | Reddit OAuth secret | `scripts/crawl_reddit.py` |
-| `REDDIT_USER_AGENT` | yes | `memeradar/0.1` | UA string | `scripts/crawl_reddit.py` |
+| `REDDIT_USER_AGENT` | no | `memeradar/0.1` | UA string | `scripts/crawl_reddit.py` |
 | `SUBREDDIT` | no | `memes` | Target subreddit | `scripts/crawl_reddit.py` |
 | `TIME_FILTER` | no | `year` | praw time window | `scripts/crawl_reddit.py` |
 | `LIMIT` | no | `1000` | Max posts | `scripts/crawl_reddit.py` |
-| `QDRANT_URL` | yes | `http://localhost:6333` | Qdrant endpoint | `backend/clients.py` |
+| `QDRANT_URL` | no | `http://localhost:6333` | Qdrant endpoint | `backend/clients.py` |
 | `QDRANT_API_KEY` | no | empty | For Qdrant Cloud | `backend/clients.py` |
 | `QDRANT_COLLECTION` | no | `memeradar` | Collection name | `backend/clients.py` |
 | `TL_API_KEY` | yes | — | Twelve Labs key | `backend/clients.py` |
 | `TL_MODEL` | no | `Marengo-retrieval-2.7` | Embed model | `backend/clients.py` |
-| `MISTRAL_API_KEY` | yes | — | Mistral key | `backend/clients.py` / `backend/decoder.py` |
+| `MISTRAL_API_KEY` | yes | — | Mistral key | `backend/clients.py` |
 | `MISTRAL_CHAT_MODEL` | no | `mistral-large-latest` | Decoder model | `backend/decoder.py` |
 | `MISTRAL_EMBED_MODEL` | no | `mistral-embed` | Irony embed | `backend/clients.py` |
-| `NEO4J_URI` | yes | `bolt://localhost:7687` | Bolt endpoint | `backend/clients.py` |
-| `NEO4J_USER` | yes | `neo4j` | Auth user | `backend/clients.py` |
+| `NEO4J_URI` | no | `bolt://localhost:7687` | Bolt endpoint | `backend/clients.py` |
+| `NEO4J_USER` | no | `neo4j` | Auth user | `backend/clients.py` |
 | `NEO4J_PASSWORD` | yes | — | Auth password | `backend/clients.py` |
 | `COGNEE_LLM_API_KEY` | no | falls back to `MISTRAL_API_KEY` | KG enrichment LLM | `backend/enrich_cognee.py` |
 | `DATA_DIR` | no | `./data` | Local asset mount | `backend/config.py` |
-| `PUBLIC_IMAGE_BASE` | yes | `http://localhost:8000/static/images` | Public URL Twelve Labs fetches | `backend/ingest.py` |
 
 The boot validation contract is specified in [CLAUDE.md §3.4 Configuration Loading](CLAUDE.md#3-system-rules--engineering-constraints). Validated by [TESTS.md §1 — TC-ENV-002](TESTS.md#1-pipeline-extraction-tests).
 

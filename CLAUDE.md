@@ -26,13 +26,15 @@ memeradar/
 │   ├── ingest.py                   # Async ingestion pipeline orchestrator
 │   ├── search.py                   # Universal Query API + RRF fusion logic
 │   ├── enrich_cognee.py            # Post-ingest knowledge-graph enrichment
+│   ├── translate.py                # Mistral multilingual caption translation
 │   ├── schemas.py                  # Pydantic V2 contracts (see §2)
 │   ├── requirements.txt
 │   └── .env.example
 │
 ├── scripts/
 │   ├── crawl_reddit.py             # PRAW-based meme harvester
-│   └── rrf_sweep.py                # CI-grade RRF rank-shift validator
+│   ├── rrf_sweep.py                # CI-grade RRF rank-shift validator
+│   └── translate_captions.py       # Batch multilingual caption backfill
 │
 ├── frontend/
 │   ├── package.json
@@ -55,7 +57,9 @@ memeradar/
 |---|---|---|---|---|
 | `GET` | `/health` | `backend/main.py` | Liveness probe | [§2.3](#23-fastapi-search-schema) |
 | `GET` | `/search` | `backend/main.py` → `backend/search.py` | RRF-fused multi-vector search | [§2.3](#23-fastapi-search-schema) |
-| `GET` | `/static/images/{filename}` | `backend/main.py` (StaticFiles) | Public image mount for Twelve Labs fetch | [§3.4](#3-system-rules--engineering-constraints) |
+| `GET` | `/static/images/{filename}` | `backend/main.py` (StaticFiles) | Local image mount for UI thumbnails (mounted only if `data/images` exists) | [§1](#1-repository-file-tree) |
+| `GET` | `/assets/{path}` | `backend/main.py` (StaticFiles) | Built SPA assets (mounted only if `frontend/dist` exists) | [§1](#1-repository-file-tree) |
+| `GET` | `/{full_path:path}` | `backend/main.py` (SPA fallback) | Serves `index.html` for client-side routes; registered last so it never shadows `/health`, `/search`, `/static`, `/assets` | [§1](#1-repository-file-tree) |
 
 ---
 
@@ -147,7 +151,7 @@ class SearchQueryParams(BaseModel):
 
 
 class LineageNode(BaseModel):
-    template: str
+    template: str | None
     variants: list[str]
 
 
@@ -178,6 +182,7 @@ Response invariants:
 2. `response.results[i].score ≥ response.results[i+1].score` (sorted by RRF score desc)
 3. `response.weights` reflects the *normalized* values actually applied, not the raw inputs.
 4. Empty results return `count: 0, results: []` — never 404. Contract enforced by [TESTS.md TC-RRF-007](TESTS.md#2-vector-search-fusion-tests).
+5. `lineage` is best-effort. When Neo4j is unavailable, `lineage.template` is `null` and `lineage.variants` is `[]`; the request still returns 200. Enforced by [TESTS.md TC-FAIL-005](TESTS.md#6-failure-boundary-assertions).
 
 ---
 
@@ -238,7 +243,7 @@ Each vendor SDK is touched in exactly ONE module:
 | Vendor | Owning module | Anywhere else? |
 |---|---|---|
 | Twelve Labs | `backend/clients.py` | Forbidden |
-| Mistral | `backend/clients.py` + `backend/decoder.py` | Forbidden |
+| Mistral | `backend/clients.py` | Forbidden — `decoder.py` & `translate.py` call the `mistral_chat_json` helper, never the SDK directly |
 | Qdrant | `backend/clients.py` + `backend/search.py` | Forbidden |
 | Neo4j | `backend/clients.py` | Forbidden |
 | Cognee | `backend/enrich_cognee.py` | Forbidden |

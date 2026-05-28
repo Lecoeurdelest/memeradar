@@ -62,7 +62,7 @@ def get_tl_client() -> httpx.AsyncClient:
     return _tl_client
 
 
-TL_VECTOR_DIM = 512
+TL_VECTOR_DIM = 1024
 MISTRAL_VECTOR_DIM = 1024
 
 
@@ -128,6 +128,22 @@ async def mistral_embed(text: str) -> list[float]:
         inputs=[text],
     )
     return list(response.data[0].embedding)
+
+
+async def mistral_chat_json(
+    messages: list[dict],
+    temperature: float,
+    max_tokens: int | None = None,
+) -> str:
+    client = get_mistral()
+    response = await client.chat.complete_async(
+        model=config.MISTRAL_CHAT_MODEL,
+        messages=messages,
+        response_format={"type": "json_object"},
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    return response.choices[0].message.content
 
 
 async def qdrant_upsert_point(

@@ -8,8 +8,7 @@ from pathlib import Path
 import pytesseract
 from PIL import Image
 
-from backend import config
-from backend.clients import get_mistral
+from backend.clients import mistral_chat_json
 from backend.schemas import MemeDecodeSchema
 
 
@@ -76,22 +75,18 @@ async def decode_meme(
     ocr_text: str,
     subreddit: str,
 ) -> tuple[MemeDecodeSchema, str]:
-    client = get_mistral()
     prompt = DECODE_PROMPT.format(
         title=title,
         ocr_text=ocr_text or "(no text)",
         subreddit=subreddit,
     )
 
-    response = await client.chat.complete_async(
-        model=config.MISTRAL_CHAT_MODEL,
+    raw = await mistral_chat_json(
         messages=[{"role": "user", "content": prompt}],
-        response_format={"type": "json_object"},
         temperature=0.3,
         max_tokens=600,
     )
 
-    raw = response.choices[0].message.content
     data = _coerce_json(raw)
 
     template = str(data.pop("template", "unknown"))[:64]

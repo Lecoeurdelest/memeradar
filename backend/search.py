@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 
 from qdrant_client import models
@@ -75,11 +76,15 @@ async def search(
 
     use_lang = lang if lang in SUPPORTED_LANGUAGES and lang != "en" else None
 
+    meme_ids = [p.payload["reddit_id"] for p in res.points]
+    lineages = await asyncio.gather(*(_safe_lineage(mid) for mid in meme_ids))
+    if use_lang:
+        captions = await asyncio.gather(*(_safe_caption(mid, use_lang) for mid in meme_ids))
+    else:
+        captions = [None] * len(meme_ids)
+
     results = []
-    for p in res.points:
-        meme_id = p.payload["reddit_id"]
-        lineage = await neo4j_lineage(meme_id)
-        caption = await neo4j_get_caption(meme_id, use_lang) if use_lang else None
+    for p, lineage, caption in zip(res.points, lineages, captions):
         results.append({
             "id": str(p.id),
             "score": p.score,
@@ -98,8 +103,21 @@ async def search(
     return results, w
 
 
+async def _safe_lineage(meme_id: str) -> dict:
+    try:
+        return await neo4j_lineage(meme_id)
+    except Exception:
+        return {"template": None, "variants": []}
+
+
+async def _safe_caption(meme_id: str, lang: str) -> dict | None:
+    try:
+        return await neo4j_get_caption(meme_id, lang)
+    except Exception:
+        return None
+
+
 async def _embed_query(query: str) -> tuple[list[float], list[float]]:
-    import asyncio
     visual_q = await tl_embed_text(query)
     delays = [2, 5, 10, 20]
     last_exc: Exception | None = None
@@ -113,7 +131,8 @@ async def _embed_query(query: str) -> tuple[list[float], list[float]]:
             last_exc = exc
             if "429" not in str(exc):
                 raise
-    raise last_exc  # type: ignore
+    assert last_exc is not None
+    raise last_exc
 
 
 def _build_filter(
