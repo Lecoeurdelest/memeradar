@@ -24,6 +24,7 @@ from backend.clients import (
     close_all,
     ensure_collection,
     mistral_embed,
+    mistral_vision_describe,
     neo4j_upsert_caption,
     neo4j_upsert_meme,
     qdrant_upsert_point,
@@ -53,6 +54,14 @@ async def ingest_one(
             return False
 
         ocr_text = await extract_text(image_path)
+
+        if entry.get("use_vlm"):
+            try:
+                vlm_desc = await _with_retry(lambda: mistral_vision_describe(image_path))
+            except Exception:
+                vlm_desc = ""
+            if vlm_desc:
+                ocr_text = f"[visual]: {vlm_desc}\n[ocr]: {ocr_text or '(no text)'}"
 
         try:
             decoded, template_from_llm = await _with_retry(
@@ -88,46 +97,77 @@ async def ingest_one(
 
         point_id = str(uuid5(NAMESPACE_URL, reddit_id))
 
+        payload = {
+            "reddit_id": reddit_id,
+            "title": entry["post_title"],
+            "ocr_text": ocr_text,
+            "image_url": entry["image_url"],
+            "permalink": entry["permalink"],
+            "upvotes": entry["upvotes"],
+            "source_subreddit": entry.get("source_subreddit", config.SUBREDDIT),
+            "template": template,
+            "core_joke": decoded.core_joke,
+            "psychological_state": decoded.psychological_state,
+            "subtext_context": decoded.subtext_context,
+            "search_dense_explanations": decoded.search_dense_explanations,
+        }
+        if entry.get("image_sha256"):
+            payload["image_sha256"] = entry["image_sha256"]
+
         await qdrant_upsert_point(
             point_id=point_id,
             visual_vec=visual_vec,
             irony_vec=irony_vec,
-            payload={
-                "reddit_id": reddit_id,
-                "title": entry["post_title"],
-                "ocr_text": ocr_text,
-                "image_url": entry["image_url"],
-                "permalink": entry["permalink"],
-                "upvotes": entry["upvotes"],
-                "source_subreddit": entry.get("source_subreddit", config.SUBREDDIT),
-                "template": template,
-                "core_joke": decoded.core_joke,
-                "psychological_state": decoded.psychological_state,
-                "subtext_context": decoded.subtext_context,
-                "search_dense_explanations": decoded.search_dense_explanations,
-            },
+            payload=payload,
         )
 
-        await neo4j_upsert_meme(
-            meme_id=reddit_id,
-            template=template,
-            title=entry["post_title"],
-            upvotes=entry["upvotes"],
-            permalink=entry["permalink"],
-            core_joke=decoded.core_joke,
-            image_path=entry["image_path"],
-        )
-
-        await neo4j_upsert_caption(
-            meme_id=reddit_id,
-            lang="en",
-            core_joke=decoded.core_joke,
-            psychological_state=decoded.psychological_state,
-            subtext_context=decoded.subtext_context,
-            search_dense_explanations=decoded.search_dense_explanations,
-        )
+        try:
+            await neo4j_upsert_meme(
+                meme_id=reddit_id,
+                template=template,
+                title=entry["post_title"],
+                upvotes=entry["upvotes"],
+                permalink=entry["permalink"],
+                core_joke=decoded.core_joke,
+                image_path=entry["image_path"],
+            )
+            await neo4j_upsert_caption(
+                meme_id=reddit_id,
+                lang="en",
+                core_joke=decoded.core_joke,
+                psychological_state=decoded.psychological_state,
+                subtext_context=decoded.subtext_context,
+                search_dense_explanations=decoded.search_dense_explanations,
+            )
+        except Exception as e:
+            quarantine.append({"id": reddit_id, "reason": f"neo4j_best_effort: {e}", "qdrant_ok": True})
 
         return True
+
+
+async def ingest_upload(
+    image_path: Path,
+    image_sha256: str,
+    title: str | None,
+) -> tuple[str, bool]:
+    reddit_id = f"upload:{image_sha256}"
+    entry = {
+        "id": reddit_id,
+        "image_path": str(image_path),
+        "post_title": (title or "user upload").strip() or "user upload",
+        "image_url": f"/static/images/{image_path.name}",
+        "permalink": f"/static/images/{image_path.name}",
+        "upvotes": 0,
+        "source_subreddit": "uploads",
+        "meme_template_name": None,
+        "image_sha256": image_sha256,
+        "use_vlm": True,
+    }
+    semaphore = asyncio.Semaphore(1)
+    quarantine: list[dict] = []
+    ok = await ingest_one(entry, semaphore, quarantine)
+    point_id = str(uuid5(NAMESPACE_URL, reddit_id))
+    return point_id, ok
 
 
 async def run(workers: int, limit: int | None, delay: float) -> None:

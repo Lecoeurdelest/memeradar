@@ -1,0 +1,195 @@
+{
+  "$schema_note": "Source of truth for feature state. Mirrors TASKS.md but machine-readable. Update at end of every session per AGENTS.md.",
+  "updated": "2026-05-29",
+  "features": [
+    {
+      "id": "F-1.1",
+      "name": "Local infrastructure bootstrap",
+      "sprint": 1,
+      "dependencies": [],
+      "status": "in-progress",
+      "tasks": {
+        "T-1.1.1": { "status": "todo", "note": "macOS verify on fresh box" },
+        "T-1.1.2": { "status": "todo", "note": "Ubuntu 22.04 verify on fresh box" },
+        "T-1.1.3": { "status": "done", "evidence": ".env.example present" }
+      },
+      "evidence": ""
+    },
+    {
+      "id": "F-1.2",
+      "name": "Reddit crawler",
+      "sprint": 1,
+      "dependencies": ["F-1.1"],
+      "status": "done",
+      "evidence": "scripts/crawl_reddit.py exists; T-1.2.1/2/3 all [x] in TASKS.md"
+    },
+    {
+      "id": "F-1.3",
+      "name": "Mistral structured decoder",
+      "sprint": 1,
+      "dependencies": ["F-1.1"],
+      "status": "done",
+      "evidence": "backend/decoder.py; T-1.3.1/2/3 all [x]"
+    },
+    {
+      "id": "F-1.4",
+      "name": "Vector + graph upsert",
+      "sprint": 1,
+      "dependencies": ["F-1.3"],
+      "status": "done",
+      "evidence": "backend/clients.py + backend/ingest.py; T-1.4.* all [x]"
+    },
+    {
+      "id": "F-1.5",
+      "name": "Knowledge-graph enrichment",
+      "sprint": 1,
+      "dependencies": ["F-1.4"],
+      "status": "done",
+      "evidence": "backend/enrich_cognee.py; T-1.5.1 [x]"
+    },
+    {
+      "id": "F-2.1",
+      "name": "Pydantic contracts",
+      "sprint": 2,
+      "dependencies": ["F-1.4"],
+      "status": "done",
+      "evidence": "backend/schemas.py mirrors CLAUDE.md §2.3"
+    },
+    {
+      "id": "F-2.2",
+      "name": "Dual query embedding",
+      "sprint": 2,
+      "dependencies": ["F-2.1"],
+      "status": "done",
+      "evidence": "Twelve Labs + Mistral embeds wired in backend/search.py"
+    },
+    {
+      "id": "F-2.3",
+      "name": "RRF fusion via Universal Query API",
+      "sprint": 2,
+      "dependencies": ["F-2.2"],
+      "status": "done",
+      "evidence": "FusionQuery(Fusion.RRF) in backend/search.py"
+    },
+    {
+      "id": "F-2.4",
+      "name": "Lineage join",
+      "sprint": 2,
+      "dependencies": ["F-1.4", "F-2.3"],
+      "status": "done",
+      "evidence": "Neo4j MATCH...VARIATION_OF*0..2 in backend/search.py"
+    },
+    {
+      "id": "F-2.5",
+      "name": "RRF rank-shift validator",
+      "sprint": 2,
+      "dependencies": ["F-2.3"],
+      "status": "done",
+      "evidence": "scripts/rrf_sweep.py; Jaccard contract met"
+    },
+    {
+      "id": "F-3.1",
+      "name": "React shell",
+      "sprint": 3,
+      "dependencies": ["F-2.3"],
+      "status": "done",
+      "evidence": "frontend/src/{App.jsx,api.js}; vite dev :5173 verified 2026-05-29"
+    },
+    {
+      "id": "F-3.2",
+      "name": "Weight slider + RRF visibility",
+      "sprint": 3,
+      "dependencies": ["F-3.1"],
+      "status": "done",
+      "evidence": "T-3.2.1/2 [x]"
+    },
+    {
+      "id": "F-3.3",
+      "name": "Failure surfaces",
+      "sprint": 3,
+      "dependencies": ["F-3.1"],
+      "status": "done",
+      "evidence": "Empty state + toast wired"
+    },
+    {
+      "id": "F-3.4",
+      "name": "Demo capture",
+      "sprint": 3,
+      "dependencies": ["F-3.1", "F-3.2", "F-3.3"],
+      "status": "todo",
+      "tasks": {
+        "T-3.4.1": { "status": "todo", "note": "Record 3-min demo per README §4" },
+        "T-3.4.2": { "status": "todo", "note": "README badges + top screenshot" }
+      },
+      "evidence": ""
+    },
+    {
+      "id": "F-4.1",
+      "name": "Translation module",
+      "sprint": 4,
+      "dependencies": ["F-1.3"],
+      "status": "done",
+      "evidence": "backend/translate.py + neo4j_upsert_caption"
+    },
+    {
+      "id": "F-4.2",
+      "name": "Batch translation script",
+      "sprint": 4,
+      "dependencies": ["F-4.1"],
+      "status": "in-progress",
+      "tasks": {
+        "T-4.2.1": { "status": "todo", "note": "scripts/translate_captions.py — idempotent, 429 backoff" },
+        "T-4.2.2": { "status": "todo", "note": "verify Neo4j MemeCaption count per lang" }
+      },
+      "evidence": ""
+    },
+    {
+      "id": "F-4.3",
+      "name": "Multilingual search endpoint",
+      "sprint": 4,
+      "dependencies": ["F-4.1"],
+      "status": "done",
+      "evidence": "lang query param + MemeHit.lang field"
+    },
+    {
+      "id": "F-4.4",
+      "name": "Language picker UI",
+      "sprint": 4,
+      "dependencies": ["F-4.3"],
+      "status": "done",
+      "evidence": "Pill buttons in frontend/src/App.jsx"
+    },
+    {
+      "id": "F-X.1",
+      "name": "CI lint + test matrix (no-comments rule)",
+      "sprint": "cross-cutting",
+      "dependencies": [],
+      "status": "todo",
+      "evidence": ""
+    },
+    {
+      "id": "F-X.2",
+      "name": "Vendor containment audit script",
+      "sprint": "cross-cutting",
+      "dependencies": [],
+      "status": "todo",
+      "evidence": ""
+    },
+    {
+      "id": "F-H.1",
+      "name": "uv migration (Python toolchain)",
+      "sprint": "harness",
+      "dependencies": [],
+      "status": "done",
+      "evidence": "pyproject.toml + uv.lock + .python-version; backend/requirements.txt removed; mistralai pinned <2; verified `uv run uvicorn` boots and /health returns ok on 2026-05-29"
+    },
+    {
+      "id": "F-H.2",
+      "name": "Agent harness (AGENTS.md + state + init)",
+      "sprint": "harness",
+      "dependencies": ["F-H.1"],
+      "status": "done",
+      "evidence": "AGENTS.md, feature_list.json, progress.md, session-handoff.md, init.ps1, init.sh created; init.ps1 smoke-tested 2026-05-29 (uv sync clean, backend.main imports, datastore probes non-fatal)"
+    }
+  ]
+}

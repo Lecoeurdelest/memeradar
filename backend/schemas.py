@@ -26,6 +26,7 @@ class QdrantPointPayload(BaseModel):
     psychological_state: str
     subtext_context: str
     search_dense_explanations: str
+    image_sha256: str | None = Field(default=None, description="SHA-256 of the source image bytes; populated for user uploads")
 
 
 class SearchQueryParams(BaseModel):
@@ -69,3 +70,17 @@ class SearchResponse(BaseModel):
     count: int
     weights: dict[Literal["visual", "irony"], float]
     results: list[MemeHit]
+
+
+class UploadCheckResponse(BaseModel):
+    image_sha256: str
+    stored_path: str
+    is_exact_duplicate: bool
+    is_likely_duplicate: bool
+    best_score: float
+    matches: list[MemeHit]
+
+
+class UploadIngestRequest(BaseModel):
+    image_sha256: str = Field(min_length=64, max_length=64, pattern="^[0-9a-f]{64}$", description="Lowercase hex SHA-256 returned by /upload/check")
+    title: str | None = Field(default=None, max_length=200, description="Optional human-supplied title")
