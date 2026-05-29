@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 cd "$(dirname "$0")"
 
-export PATH="/tmp/node-v22.14.0-darwin-arm64/bin:$PATH"
+echo "=== Building frontend (always fresh dist) ==="
+(
+  cd frontend
+  [ -d node_modules ] || npm install
+  VITE_API=http://localhost:8000 npm run build
+)
 
-echo "Building frontend..."
-cd frontend
-VITE_API=http://localhost:8000 node node_modules/.bin/vite build --logLevel silent
-cd ..
-
-echo "Starting server on :8000 (backend + frontend)..."
-.venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000
+echo "=== Starting server on http://localhost:8000 (backend + frontend) ==="
+uv run uvicorn backend.main:app --host 0.0.0.0 --port 8000
