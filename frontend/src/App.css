@@ -85,3 +85,52 @@ header p { color: var(--muted); margin: 4px 0 24px; }
 }
 .lang-btn:hover { border-color: var(--accent); color: var(--fg); }
 .lang-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+
+.upload-btn {
+  background: transparent !important;
+  border: 1px solid #25252f !important;
+  color: var(--fg) !important;
+  font-weight: 600 !important;
+  padding: 0 18px !important;
+}
+.upload-btn:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+.upload-btn:disabled { opacity: .5; cursor: wait; }
+
+.upload-modal { flex-direction: column; max-width: 900px; }
+.upload-modal h3 { margin: 0 0 8px; }
+.upload-meta { color: var(--muted); font-size: 12px; margin: 0 0 16px; }
+.upload-meta code { background: #1f1f29; padding: 2px 6px; border-radius: 4px; }
+
+.upload-preview { margin-bottom: 16px; }
+.upload-preview img { max-width: 240px; max-height: 240px; border-radius: 8px; object-fit: contain; }
+.upload-label { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+
+.upload-matches {
+  display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  margin-bottom: 16px;
+}
+.upload-match {
+  background: #1a1a23; border: 1px solid #25252f; border-radius: 10px;
+  padding: 0; overflow: hidden; cursor: pointer; color: var(--fg);
+  display: flex; flex-direction: column; transition: border-color .15s, transform .15s;
+}
+.upload-match:hover { border-color: var(--accent); transform: translateY(-2px); }
+.upload-match img { width: 100%; aspect-ratio: 1; object-fit: cover; max-width: 100%; max-height: none; border-radius: 0; }
+.upload-match-meta {
+  display: flex; justify-content: space-between; padding: 6px 10px;
+  font-size: 11px; color: var(--muted);
+}
+.upload-match-meta .score { color: var(--accent); font-variant-numeric: tabular-nums; }
+.upload-match-cta {
+  background: #15151d; color: var(--accent); padding: 8px; text-align: center;
+  font-size: 12px; font-weight: 600; border-top: 1px solid #25252f;
+}
+
+.upload-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.upload-actions button {
+  padding: 10px 18px; border-radius: 8px; border: 0; cursor: pointer; font-size: 14px; font-weight: 600;
+}
+.upload-actions .ghost { background: transparent; color: var(--muted); border: 1px solid #25252f; }
+.upload-actions .ghost:hover { color: var(--fg); border-color: var(--fg); }
+.upload-actions .primary { background: var(--accent); color: #fff; }
+.upload-actions button:disabled { opacity: .5; cursor: wait; }

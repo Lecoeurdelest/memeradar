@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { searchMemes, LANGUAGES } from './api.js'
+import { searchMemes, uploadCheck, uploadIngest, resolveImageUrl, LANGUAGES, UPLOAD_STRINGS } from './api.js'
 import './App.css'
 
 export default function App() {
@@ -10,10 +10,14 @@ export default function App() {
   const [visual, setVisual] = useState(0.35)
   const [lang, setLang] = useState('en')
   const [active, setActive] = useState(null)
+  const [uploadState, setUploadState] = useState(null)
+  const [uploadBusy, setUploadBusy] = useState(false)
   const debounceRef = useRef(null)
   const lastQuery = useRef('')
+  const fileInputRef = useRef(null)
 
   const irony = +(1 - visual).toFixed(2)
+  const t = UPLOAD_STRINGS[lang] || UPLOAD_STRINGS.en
 
   function showToast(msg) {
     setToast(msg)
@@ -48,6 +52,49 @@ export default function App() {
     debounceRef.current = setTimeout(() => go(val, lastQuery.current), 400)
   }
 
+  function onPickFile() {
+    fileInputRef.current?.click()
+  }
+
+  async function onFileChosen(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      showToast(t.pickImage)
+      return
+    }
+    setUploadBusy(true)
+    try {
+      const data = await uploadCheck(file)
+      setUploadState(data)
+    } catch (err) {
+      showToast(`${t.uploadFailed}: ${err.message}`)
+    } finally {
+      setUploadBusy(false)
+    }
+  }
+
+  async function onConfirmNewMeme() {
+    if (!uploadState) return
+    setUploadBusy(true)
+    try {
+      const hit = await uploadIngest({ imageSha256: uploadState.image_sha256, title: null })
+      setResults((prev) => [hit, ...(prev || [])])
+      setUploadState(null)
+      showToast(t.addedOk)
+    } catch (err) {
+      showToast(`${t.ingestFailed}: ${err.message}`)
+    } finally {
+      setUploadBusy(false)
+    }
+  }
+
+  function onPickMatch(match) {
+    setUploadState(null)
+    setActive(match)
+  }
+
   return (
     <div className="app">
       {toast && <div className="toast">{toast}</div>}
@@ -65,6 +112,16 @@ export default function App() {
           onChange={(e) => setQ(e.target.value)}
         />
         <button disabled={loading}>{loading ? '…' : 'Search'}</button>
+        <button type="button" className="upload-btn" onClick={onPickFile} disabled={uploadBusy} title="Upload an image to check or add">
+          {uploadBusy ? '…' : '⬆ Upload'}
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          style={{ display: 'none' }}
+          onChange={onFileChosen}
+        />
       </form>
 
       <div className="weights">
@@ -96,7 +153,7 @@ export default function App() {
       <div className="grid">
         {(results || []).map((m) => (
           <article key={m.id} className="card" onClick={() => setActive(m)}>
-            <img src={m.image_url} alt={m.title} loading="lazy" />
+            <img src={resolveImageUrl(m.image_url)} alt={m.title} loading="lazy" />
             <div className="meta">
               <span className="tpl">{m.template}</span>
               <span className="score">{m.score.toFixed(3)}</span>
@@ -108,7 +165,7 @@ export default function App() {
       {active && (
         <div className="modal" onClick={() => setActive(null)}>
           <div className="modal-inner" onClick={(e) => e.stopPropagation()}>
-            <img src={active.image_url} alt="" />
+            <img src={resolveImageUrl(active.image_url)} alt="" />
             <div className="info">
               <h3>{active.title}</h3>
               <p className="core-joke">{active.core_joke}</p>
@@ -124,6 +181,56 @@ export default function App() {
                 )}
               </div>
               <a href={active.permalink} target="_blank" rel="noreferrer">source ↗</a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {uploadState && (
+        <div className="modal" onClick={() => !uploadBusy && setUploadState(null)}>
+          <div className="modal-inner upload-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>
+              {uploadState.is_exact_duplicate
+                ? t.headerExact
+                : uploadState.is_likely_duplicate
+                  ? t.headerLikely
+                  : t.headerAsk}
+            </h3>
+            <p className="upload-meta">
+              SHA-256: <code>{uploadState.image_sha256.slice(0, 12)}…</code>
+              {' · '}{t.bestScore}: <b>{uploadState.best_score.toFixed(3)}</b>
+            </p>
+
+            <div className="upload-preview">
+              <div>
+                <div className="upload-label">{t.youUploaded}</div>
+                <img src={resolveImageUrl(uploadState.stored_path)} alt="upload preview" />
+              </div>
+            </div>
+
+            <div className="upload-matches">
+              {uploadState.matches.map((m) => (
+                <button key={m.id} className="upload-match" onClick={() => onPickMatch(m)}>
+                  <img src={resolveImageUrl(m.image_url)} alt={m.title} />
+                  <div className="upload-match-meta">
+                    <span className="tpl">{m.template}</span>
+                    <span className="score">{m.score.toFixed(3)}</span>
+                  </div>
+                  <div className="upload-match-cta">{t.pickMatch}</div>
+                </button>
+              ))}
+              {uploadState.matches.length === 0 && (
+                <div className="empty">{t.noMatches}</div>
+              )}
+            </div>
+
+            <div className="upload-actions">
+              <button className="ghost" onClick={() => setUploadState(null)} disabled={uploadBusy}>{t.close}</button>
+              {!uploadState.is_exact_duplicate && (
+                <button className="primary" onClick={onConfirmNewMeme} disabled={uploadBusy}>
+                  {uploadBusy ? '…' : t.addAsNew}
+                </button>
+              )}
             </div>
           </div>
         </div>

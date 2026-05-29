@@ -1,13 +1,19 @@
 from __future__ import annotations
 
+import base64
+import io
 from pathlib import Path
 
 import httpx
 from mistralai import Mistral
 from neo4j import AsyncGraphDatabase
+from PIL import Image
 from qdrant_client import AsyncQdrantClient, models
 
 from backend import config
+
+
+TL_EMBED_SUPPORTED_MIME = {"image/jpeg", "image/png"}
 
 
 _qdrant: AsyncQdrantClient | None = None
@@ -84,10 +90,40 @@ async def ensure_collection() -> None:
         ("subtext_context", models.PayloadSchemaType.KEYWORD),
         ("source_subreddit", models.PayloadSchemaType.KEYWORD),
         ("upvotes", models.PayloadSchemaType.INTEGER),
+        ("image_sha256", models.PayloadSchemaType.KEYWORD),
     ]:
         await client.create_payload_index(
             config.QDRANT_COLLECTION, field_name, field_type,
         )
+
+
+async def ensure_sha256_index() -> None:
+    client = get_qdrant()
+    try:
+        await client.create_payload_index(
+            config.QDRANT_COLLECTION,
+            "image_sha256",
+            models.PayloadSchemaType.KEYWORD,
+        )
+    except Exception:
+        pass
+
+
+async def qdrant_scroll_by_sha256(sha256: str) -> dict | None:
+    client = get_qdrant()
+    points, _ = await client.scroll(
+        collection_name=config.QDRANT_COLLECTION,
+        scroll_filter=models.Filter(
+            must=[models.FieldCondition(key="image_sha256", match=models.MatchValue(value=sha256))]
+        ),
+        limit=1,
+        with_payload=True,
+        with_vectors=False,
+    )
+    if not points:
+        return None
+    p = points[0]
+    return {"id": str(p.id), "payload": p.payload}
 
 
 async def tl_embed_image_file(image_path: Path) -> list[float]:
@@ -95,15 +131,30 @@ async def tl_embed_image_file(image_path: Path) -> list[float]:
     ext = image_path.suffix.lower()
     mime = MIME_MAP.get(ext, "image/jpeg")
     image_bytes = image_path.read_bytes()
+    upload_name = image_path.name
+    if mime not in TL_EMBED_SUPPORTED_MIME:
+        img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        image_bytes = buf.getvalue()
+        mime = "image/png"
+        upload_name = f"{image_path.stem}.png"
     response = await client.post(
         "/embed",
         data={"model_name": config.TL_MODEL},
-        files={"image_file": (image_path.name, image_bytes, mime)},
+        files={"image_file": (upload_name, image_bytes, mime)},
     )
     response.raise_for_status()
     data = response.json()
-    seg = data["image_embedding"]["segments"][0]
-    return seg.get("float", seg.get("embeddings_float"))
+    img = data.get("image_embedding") or data.get("video_embedding") or data
+    segs = img.get("segments") if isinstance(img, dict) else None
+    if not segs:
+        raise RuntimeError(f"twelvelabs response missing segments: keys={list(data.keys())} body={str(data)[:400]}")
+    seg = segs[0]
+    vec = seg.get("float") or seg.get("embeddings_float") or seg.get("embedding")
+    if not vec:
+        raise RuntimeError(f"twelvelabs segment missing vector: keys={list(seg.keys())}")
+    return vec
 
 
 async def tl_embed_text(text: str) -> list[float]:
@@ -128,6 +179,41 @@ async def mistral_embed(text: str) -> list[float]:
         inputs=[text],
     )
     return list(response.data[0].embedding)
+
+
+VISION_DESCRIBE_PROMPT = (
+    "You are analyzing a meme image. In 2-4 sentences, describe what is literally visible: "
+    "characters, expressions, setting, any visible text, layout/panels, and notable visual style. "
+    "Be concrete and concise. Plain text only, no preamble."
+)
+
+
+async def mistral_vision_describe(image_path: Path) -> str:
+    ext = image_path.suffix.lower()
+    mime = MIME_MAP.get(ext, "image/jpeg")
+    image_bytes = image_path.read_bytes()
+    if mime not in {"image/jpeg", "image/png"}:
+        img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        image_bytes = buf.getvalue()
+        mime = "image/png"
+    b64 = base64.b64encode(image_bytes).decode("ascii")
+    data_url = f"data:{mime};base64,{b64}"
+    client = get_mistral()
+    response = await client.chat.complete_async(
+        model=config.MISTRAL_VISION_MODEL,
+        messages=[{
+            "role": "user",
+            "content": [
+                {"type": "text", "text": VISION_DESCRIBE_PROMPT},
+                {"type": "image_url", "image_url": data_url},
+            ],
+        }],
+        temperature=0.2,
+        max_tokens=300,
+    )
+    return (response.choices[0].message.content or "").strip()
 
 
 async def mistral_chat_json(

@@ -28,8 +28,11 @@ memeradar/
 │   ├── enrich_cognee.py            # Post-ingest knowledge-graph enrichment
 │   ├── translate.py                # Mistral multilingual caption translation
 │   ├── schemas.py                  # Pydantic V2 contracts (see §2)
-│   ├── requirements.txt
 │   └── .env.example
+│
+├── pyproject.toml                  # uv-managed dependency manifest
+├── uv.lock                         # uv resolver lockfile
+├── .python-version                 # pinned interpreter (3.11)
 │
 ├── scripts/
 │   ├── crawl_reddit.py             # PRAW-based meme harvester
@@ -201,7 +204,7 @@ Application code under `backend/` and `scripts/` MUST NOT contain:
 Exemptions (whitelisted):
 
 - `backend/schemas.py` — Pydantic `Field(description=...)` is permitted; docstrings still forbidden.
-- `requirements.txt` and `.env.example` may carry comments.
+- `pyproject.toml` and `.env.example` may carry comments.
 - Markdown files (`*.md`) are unaffected.
 - Test files in any future `tests/` directory may use docstrings as test names.
 

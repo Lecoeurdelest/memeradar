@@ -39,40 +39,89 @@ async def search(
     lang: str = "en",
 ) -> tuple[list[dict], Weights]:
     w = (weights or Weights()).normalized()
-
     visual_q, irony_q = await _embed_query(query)
+    results = await _query_by_vectors(
+        visual_vec=visual_q,
+        irony_vec=irony_q,
+        k=k,
+        weights=w,
+        template_filter=template_filter,
+        psychological_state_filter=psychological_state_filter,
+        lang=lang,
+    )
+    return results, w
 
+
+async def query_by_visual_vector(
+    visual_vec: list[float],
+    k: int,
+    lang: str = "en",
+) -> list[dict]:
+    return await _query_by_vectors(
+        visual_vec=visual_vec,
+        irony_vec=None,
+        k=k,
+        weights=Weights(visual=1.0, irony=0.0),
+        template_filter=None,
+        psychological_state_filter=None,
+        lang=lang,
+    )
+
+
+async def _query_by_vectors(
+    visual_vec: list[float] | None,
+    irony_vec: list[float] | None,
+    k: int,
+    weights: Weights,
+    template_filter: str | None,
+    psychological_state_filter: str | None,
+    lang: str,
+) -> list[dict]:
     qfilter = _build_filter(template_filter, psychological_state_filter)
 
     prefetches = []
-    if w.visual > 0.01:
+    if visual_vec is not None and weights.visual > 0.01:
         prefetches.append(models.Prefetch(
-            query=visual_q,
+            query=visual_vec,
             using="visual",
-            limit=_candidates_per_space(w.visual, k),
+            limit=_candidates_per_space(weights.visual, k),
             filter=qfilter,
         ))
-    if w.irony > 0.01:
+    if irony_vec is not None and weights.irony > 0.01:
         prefetches.append(models.Prefetch(
-            query=irony_q,
+            query=irony_vec,
             using="irony",
-            limit=_candidates_per_space(w.irony, k),
+            limit=_candidates_per_space(weights.irony, k),
             filter=qfilter,
         ))
     if not prefetches:
-        prefetches = [
-            models.Prefetch(query=visual_q, using="visual", limit=k, filter=qfilter),
-            models.Prefetch(query=irony_q, using="irony", limit=k, filter=qfilter),
-        ]
+        if visual_vec is not None:
+            prefetches.append(models.Prefetch(query=visual_vec, using="visual", limit=k, filter=qfilter))
+        if irony_vec is not None:
+            prefetches.append(models.Prefetch(query=irony_vec, using="irony", limit=k, filter=qfilter))
+    if not prefetches:
+        return []
 
     client = get_qdrant()
-    res = await client.query_points(
-        collection_name=config.QDRANT_COLLECTION,
-        prefetch=prefetches,
-        query=models.FusionQuery(fusion=models.Fusion.RRF),
-        limit=k,
-        with_payload=True,
-    )
+
+    if len(prefetches) == 1:
+        only = prefetches[0]
+        res = await client.query_points(
+            collection_name=config.QDRANT_COLLECTION,
+            query=only.query,
+            using=only.using,
+            query_filter=qfilter,
+            limit=k,
+            with_payload=True,
+        )
+    else:
+        res = await client.query_points(
+            collection_name=config.QDRANT_COLLECTION,
+            prefetch=prefetches,
+            query=models.FusionQuery(fusion=models.Fusion.RRF),
+            limit=k,
+            with_payload=True,
+        )
 
     use_lang = lang if lang in SUPPORTED_LANGUAGES and lang != "en" else None
 
@@ -100,7 +149,7 @@ async def search(
             "lineage": lineage,
         })
 
-    return results, w
+    return results
 
 
 async def _safe_lineage(meme_id: str) -> dict:

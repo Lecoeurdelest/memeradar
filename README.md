@@ -13,6 +13,7 @@ Native binaries only. No Docker. See [CLAUDE.md §3 System Rules](CLAUDE.md#3-sy
 | Component | Version | Port | Purpose | Spec ref |
 |---|---|---|---|---|
 | Python | ≥ 3.11 | — | Backend runtime | [CLAUDE.md §1](CLAUDE.md#1-repository-file-tree) |
+| uv | ≥ 0.5 | — | Python package & venv manager | [CLAUDE.md §1](CLAUDE.md#1-repository-file-tree) |
 | Node.js | ≥ 20 LTS | — | Frontend toolchain | [CLAUDE.md §1](CLAUDE.md#1-repository-file-tree) |
 | Qdrant | ≥ 1.12 | 6333 / 6334 | Vector store | [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping) |
 | Neo4j Community | ≥ 5.20 | 7687 / 7474 | Graph store | [CLAUDE.md §2.3](CLAUDE.md#23-fastapi-search-schema) |
@@ -21,7 +22,7 @@ Native binaries only. No Docker. See [CLAUDE.md §3 System Rules](CLAUDE.md#3-sy
 ### 1.1 macOS (Homebrew)
 
 ```bash
-brew install python@3.11 node tesseract
+brew install python@3.11 node tesseract uv
 brew install qdrant
 brew install neo4j
 
@@ -36,6 +37,8 @@ Qdrant runs in the foreground with `qdrant` after install (binary auto-creates `
 ```bash
 sudo apt update
 sudo apt install -y python3.11 python3.11-venv python3-pip tesseract-ocr
+
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
@@ -57,10 +60,11 @@ tesseract --version
 qdrant --version
 cypher-shell -u neo4j -p changeme "RETURN 1"
 python3.11 --version
+uv --version
 node --version
 ```
 
-All five must exit 0. Verified by [TESTS.md §1 — TC-ENV-001](TESTS.md#1-pipeline-extraction-tests).
+All six must exit 0. Verified by [TESTS.md §1 — TC-ENV-001](TESTS.md#1-pipeline-extraction-tests).
 
 ---
 
@@ -103,14 +107,14 @@ Each phase maps directly to a sprint in [TASKS.md](TASKS.md).
 ```bash
 git clone <repo> memeradar && cd memeradar
 
-python3.11 -m venv .venv
-source .venv/bin/activate
-pip install -r backend/requirements.txt
+uv sync
 
 cp backend/.env.example backend/.env
 
 cd frontend && npm install && cd ..
 ```
+
+`uv sync` reads `pyproject.toml` + `uv.lock`, provisions a Python 3.11 interpreter if missing, materializes `.venv/`, and installs the locked dependency set. Re-running it is the idempotent way to refresh the environment.
 
 ### Phase 1 — Spin up local datastores
 
@@ -119,7 +123,7 @@ Open three terminals. See [TASKS.md Sprint 1 → T-1.1](TASKS.md#sprint-1--inges
 ```bash
 qdrant
 neo4j console
-uvicorn backend.main:app --host 0.0.0.0 --port 8000
+uv run uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
 Health checks (a fourth terminal):
@@ -135,15 +139,13 @@ curl -s http://localhost:8000/health
 Maps to [TASKS.md Sprint 1 → T-1.2, T-1.3, T-1.4](TASKS.md#sprint-1--ingestion--storage-days-13).
 
 ```bash
-source .venv/bin/activate
+uv run python -m scripts.crawl_reddit
 
-python -m scripts.crawl_reddit
+uv run python -m backend.ingest --workers 4 --limit 50
 
-python -m backend.ingest --workers 4 --limit 50
+uv run python -m backend.ingest --workers 4
 
-python -m backend.ingest --workers 4
-
-python -m backend.enrich_cognee
+uv run python -m backend.enrich_cognee
 ```
 
 The first ingest pass uses `--limit 50` to validate end-to-end before burning the full Twelve Labs quota. See [TESTS.md §1 — TC-ING-005](TESTS.md#1-pipeline-extraction-tests).
@@ -198,7 +200,7 @@ For the sweep to count as a passing demo, the operator must verify:
 Programmatic equivalent of the manual sweep, used by CI:
 
 ```bash
-python -m scripts.rrf_sweep --query "absolute panic when production crashes" --k 5
+uv run python -m scripts.rrf_sweep --query "absolute panic when production crashes" --k 5
 ```
 
 Behavior contract: emits a JSON report with the five top-k lists and the Jaccard matrix. Exit code 0 only if assertions 1–3 above hold. Implementation scope is specified in [TASKS.md Sprint 2 → T-2.5](TASKS.md#sprint-2--search-fusion-engine-days-46).

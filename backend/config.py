@@ -46,6 +46,7 @@ TL_MODEL = os.getenv("TL_MODEL", "Marengo-retrieval-2.7")
 MISTRAL_API_KEY = os.environ["MISTRAL_API_KEY"]
 MISTRAL_CHAT_MODEL = os.getenv("MISTRAL_CHAT_MODEL", "mistral-large-latest")
 MISTRAL_EMBED_MODEL = os.getenv("MISTRAL_EMBED_MODEL", "mistral-embed")
+MISTRAL_VISION_MODEL = os.getenv("MISTRAL_VISION_MODEL", "pixtral-12b-2409")
 
 NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
 NEO4J_USER = os.getenv("NEO4J_USER") or os.getenv("NEO4J_USERNAME", "neo4j")
@@ -57,3 +58,9 @@ DATA_DIR = Path(os.getenv("DATA_DIR", "./data"))
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 (DATA_DIR / "images").mkdir(parents=True, exist_ok=True)
+
+NEAR_DUPLICATE_THRESHOLD = float(os.getenv("NEAR_DUPLICATE_THRESHOLD", "0.92"))
+UPLOAD_MAX_BYTES = int(os.getenv("UPLOAD_MAX_BYTES", str(8 * 1024 * 1024)))
+UPLOAD_ALLOWED_MIME = {"image/jpeg", "image/png", "image/webp"}
+UPLOAD_MIME_TO_EXT = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
+UPLOAD_TOPK = int(os.getenv("UPLOAD_TOPK", "5"))
