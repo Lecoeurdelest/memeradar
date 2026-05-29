@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { searchMemes, uploadCheck, uploadIngest, resolveImageUrl, LANGUAGES, UPLOAD_STRINGS } from './api.js'
+import { useState, useRef, useEffect } from 'react'
+import { searchMemes, randomMemes, uploadCheck, uploadIngest, resolveImageUrl, LANGUAGES, UPLOAD_STRINGS } from './api.js'
 import './App.css'
 
 export default function App() {
@@ -43,6 +43,22 @@ export default function App() {
     e?.preventDefault()
     go(visual, q.trim())
   }
+
+  async function rollRandom(langVal) {
+    setLoading(true)
+    lastQuery.current = ''
+    setQ('')
+    try {
+      const data = await randomMemes({ k: 24, lang: langVal ?? lang })
+      setResults(data.results || [])
+    } catch (err) {
+      showToast('Could not load memes — backend error.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { rollRandom() }, [])
 
   function onSlider(e) {
     const val = parseFloat(e.target.value)
@@ -112,6 +128,7 @@ export default function App() {
           onChange={(e) => setQ(e.target.value)}
         />
         <button disabled={loading}>{loading ? '…' : 'Search'}</button>
+        <button type="button" className="roll-btn" onClick={() => rollRandom()} disabled={loading} title="Show random memes">🎲 Random</button>
         <button type="button" className="upload-btn" onClick={onPickFile} disabled={uploadBusy} title="Upload an image to check or add">
           {uploadBusy ? '…' : '⬆ Upload'}
         </button>
@@ -141,7 +158,7 @@ export default function App() {
           <button
             key={code}
             className={`lang-btn${lang === code ? ' active' : ''}`}
-            onClick={() => { setLang(code); if (lastQuery.current) go(visual, lastQuery.current, code) }}
+            onClick={() => { setLang(code); if (lastQuery.current) go(visual, lastQuery.current, code); else rollRandom(code) }}
           >{label}</button>
         ))}
       </div>
@@ -156,7 +173,7 @@ export default function App() {
             <img src={resolveImageUrl(m.image_url)} alt={m.title} loading="lazy" />
             <div className="meta">
               <span className="tpl">{m.template}</span>
-              <span className="score">{m.score.toFixed(3)}</span>
+              {m.score > 0 && <span className="score">{m.score.toFixed(3)}</span>}
             </div>
           </article>
         ))}

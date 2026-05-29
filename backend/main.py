@@ -28,7 +28,7 @@ from backend.schemas import (
     UploadCheckResponse,
     UploadIngestRequest,
 )
-from backend.search import Weights, query_by_visual_vector, search
+from backend.search import Weights, query_by_visual_vector, random_memes, search
 from backend.clients import neo4j_lineage
 
 
@@ -183,6 +183,26 @@ async def upload_ingest(body: UploadIngestRequest):
     payload = fresh["payload"] if fresh else {}
     lineage = await _safe_lineage(reddit_id)
     return MemeHit(**_hit_from_payload(point_id, payload, 1.0, lineage))
+
+
+@app.get("/random", response_model=SearchResponse)
+async def random_endpoint(
+    k: Annotated[int, Query(ge=1, le=100)] = 24,
+    lang: str = "en",
+):
+    try:
+        results = await random_memes(k=k, lang=lang)
+    except Exception:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "search_unavailable", "detail": "vector store unreachable"},
+        )
+    return SearchResponse(
+        query="",
+        count=len(results),
+        weights={"visual": 1.0, "irony": 0.0},
+        results=results,
+    )
 
 
 if _FRONTEND_DIST.exists():

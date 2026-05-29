@@ -59,7 +59,8 @@ memeradar/
 | Method | Path | Module | Purpose | Spec ref |
 |---|---|---|---|---|
 | `GET` | `/health` | `backend/main.py` | Liveness probe | [§2.3](#23-fastapi-search-schema) |
-| `GET` | `/search` | `backend/main.py` → `backend/search.py` | RRF-fused multi-vector search | [§2.3](#23-fastapi-search-schema) |
+| `GET` | `/search` | `backend/main.py` → `backend/search.py` | RRF-fused multi-vector search | [§2.3](#23-fastapi-search-schema) |
+| `GET` | `/random` | `backend/main.py` → `backend/search.py` | Random meme sample for the home grid (Qdrant RANDOM sampling) | [§1](#1-repository-file-tree) |
 | `GET` | `/static/images/{filename}` | `backend/main.py` (StaticFiles) | Local image mount for UI thumbnails (mounted only if `data/images` exists) | [§1](#1-repository-file-tree) |
 | `GET` | `/assets/{path}` | `backend/main.py` (StaticFiles) | Built SPA assets (mounted only if `frontend/dist` exists) | [§1](#1-repository-file-tree) |
 | `GET` | `/{full_path:path}` | `backend/main.py` (SPA fallback) | Serves `index.html` for client-side routes; registered last so it never shadows `/health`, `/search`, `/static`, `/assets` | [§1](#1-repository-file-tree) |

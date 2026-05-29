@@ -147,3 +147,10 @@ export async function uploadIngest({ imageSha256, title }) {
   }
   return res.json()
 }
+
+export async function randomMemes({ k = 24, lang = 'en' } = {}) {
+  const params = new URLSearchParams({ k: String(k), lang })
+  const res = await fetch(`${API}/random?${params}`)
+  if (!res.ok) throw new Error(`random failed: ${res.status}`)
+  return res.json()
+}

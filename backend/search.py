@@ -68,6 +68,20 @@ async def query_by_visual_vector(
     )
 
 
+async def random_memes(k: int = 24, lang: str = "en") -> list[dict]:
+    client = get_qdrant()
+    res = await client.query_points(
+        collection_name=config.QDRANT_COLLECTION,
+        query=models.SampleQuery(sample=models.Sample.RANDOM),
+        limit=k,
+        with_payload=True,
+    )
+    results = await _assemble(res.points, lang)
+    for r in results:
+        r["score"] = 0.0
+    return results
+
+
 async def _query_by_vectors(
     visual_vec: list[float] | None,
     irony_vec: list[float] | None,
@@ -123,9 +137,13 @@ async def _query_by_vectors(
             with_payload=True,
         )
 
+    return await _assemble(res.points, lang)
+
+
+async def _assemble(points, lang: str) -> list[dict]:
     use_lang = lang if lang in SUPPORTED_LANGUAGES and lang != "en" else None
 
-    meme_ids = [p.payload["reddit_id"] for p in res.points]
+    meme_ids = [p.payload["reddit_id"] for p in points]
     lineages = await asyncio.gather(*(_safe_lineage(mid) for mid in meme_ids))
     if use_lang:
         captions = await asyncio.gather(*(_safe_caption(mid, use_lang) for mid in meme_ids))
@@ -133,7 +151,7 @@ async def _query_by_vectors(
         captions = [None] * len(meme_ids)
 
     results = []
-    for p, lineage, caption in zip(res.points, lineages, captions):
+    for p, lineage, caption in zip(points, lineages, captions):
         results.append({
             "id": str(p.id),
             "score": p.score,
