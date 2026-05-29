@@ -134,3 +134,13 @@ header p { color: var(--muted); margin: 4px 0 24px; }
 .upload-actions .ghost:hover { color: var(--fg); border-color: var(--fg); }
 .upload-actions .primary { background: var(--accent); color: #fff; }
 .upload-actions button:disabled { opacity: .5; cursor: wait; }
+
+.roll-btn {
+  background: transparent !important;
+  border: 1px solid #25252f !important;
+  color: var(--fg) !important;
+  font-weight: 600 !important;
+  padding: 0 18px !important;
+}
+.roll-btn:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+.roll-btn:disabled { opacity: .5; cursor: wait; }
