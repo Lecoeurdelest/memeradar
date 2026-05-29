@@ -56,6 +56,13 @@ COGNEE_LLM_API_KEY = os.getenv("COGNEE_LLM_API_KEY", "") or MISTRAL_API_KEY
 
 DATA_DIR = Path(os.getenv("DATA_DIR", "./data"))
 
+S3_ENDPOINT = os.getenv("S3_ENDPOINT", "")
+S3_REGION = os.getenv("S3_REGION", "")
+S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", "")
+S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", "")
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "")
+S3_ENABLED = all([S3_REGION, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET_NAME])
+
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 (DATA_DIR / "images").mkdir(parents=True, exist_ok=True)
 

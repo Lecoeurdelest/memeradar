@@ -149,14 +149,16 @@ async def ingest_upload(
     image_path: Path,
     image_sha256: str,
     title: str | None,
+    image_url: str | None = None,
 ) -> tuple[str, bool]:
     reddit_id = f"upload:{image_sha256}"
+    _image_url = image_url or f"/static/images/{image_path.name}"
     entry = {
         "id": reddit_id,
         "image_path": str(image_path),
         "post_title": (title or "user upload").strip() or "user upload",
-        "image_url": f"/static/images/{image_path.name}",
-        "permalink": f"/static/images/{image_path.name}",
+        "image_url": _image_url,
+        "permalink": _image_url,
         "upvotes": 0,
         "source_subreddit": "uploads",
         "meme_template_name": None,

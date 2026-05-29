@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import os
+import tempfile
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated
@@ -30,6 +32,7 @@ from backend.schemas import (
 )
 from backend.search import Weights, query_by_visual_vector, random_memes, search
 from backend.clients import neo4j_lineage
+from backend import storage as _storage
 
 
 @asynccontextmanager
@@ -123,10 +126,17 @@ async def upload_check(file: UploadFile = File(...)):
 
     sha = await asyncio.to_thread(lambda: hashlib.sha256(body).hexdigest())
     ext = config.UPLOAD_MIME_TO_EXT[file.content_type]
-    stored = config.DATA_DIR / "images" / f"{sha}{ext}"
-    if not stored.exists():
-        await asyncio.to_thread(stored.write_bytes, body)
-    stored_url = f"/static/images/{stored.name}"
+    s3_key = f"uploads/{sha}{ext}"
+
+    if config.S3_ENABLED:
+        if not await _storage.s3_exists(s3_key):
+            await _storage.s3_upload(s3_key, body, file.content_type)
+        stored_url = _storage.s3_public_url(s3_key)
+    else:
+        stored = config.DATA_DIR / "images" / f"{sha}{ext}"
+        if not stored.exists():
+            await asyncio.to_thread(stored.write_bytes, body)
+        stored_url = f"/static/images/{stored.name}"
 
     existing = await qdrant_scroll_by_sha256(sha)
     if existing is not None:
@@ -141,10 +151,23 @@ async def upload_check(file: UploadFile = File(...)):
             matches=[MemeHit(**hit)],
         )
 
+    if config.S3_ENABLED:
+        tmp = tempfile.NamedTemporaryFile(suffix=ext, delete=False)
+        tmp.write(body)
+        tmp.close()
+        embed_path = Path(tmp.name)
+    else:
+        embed_path = config.DATA_DIR / "images" / f"{sha}{ext}"
+
     try:
-        visual_vec = await tl_embed_image_file(stored)
+        visual_vec = await tl_embed_image_file(embed_path)
     except Exception as exc:
+        if config.S3_ENABLED:
+            os.unlink(embed_path)
         raise HTTPException(status_code=502, detail=f"visual embedding failed: {exc}")
+    finally:
+        if config.S3_ENABLED and embed_path.exists():
+            os.unlink(embed_path)
 
     matches = await query_by_visual_vector(visual_vec=visual_vec, k=config.UPLOAD_TOPK)
     best = matches[0]["score"] if matches else 0.0
@@ -161,20 +184,43 @@ async def upload_check(file: UploadFile = File(...)):
 @app.post("/upload/ingest", response_model=MemeHit)
 async def upload_ingest(body: UploadIngestRequest):
     sha = body.image_sha256
-    candidates = list((config.DATA_DIR / "images").glob(f"{sha}.*"))
-    if not candidates:
-        raise HTTPException(status_code=404, detail="image not found; call /upload/check first")
-    image_path = candidates[0]
 
     existing = await qdrant_scroll_by_sha256(sha)
     if existing is not None:
         lineage = await _safe_lineage(existing["payload"].get("reddit_id", ""))
         return MemeHit(**_hit_from_payload(existing["id"], existing["payload"], 1.0, lineage))
 
+    if config.S3_ENABLED:
+        s3_key_candidates = [f"uploads/{sha}.jpg", f"uploads/{sha}.png",
+                             f"uploads/{sha}.gif", f"uploads/{sha}.webp"]
+        s3_key = None
+        for _candidate in s3_key_candidates:
+            if await _storage.s3_exists(_candidate):
+                s3_key = _candidate
+                break
+        if s3_key is None:
+            raise HTTPException(status_code=404, detail="image not found in S3; call /upload/check first")
+        ext = Path(s3_key).suffix
+        img_data = await _storage.s3_download(s3_key)
+        tmp = tempfile.NamedTemporaryFile(suffix=ext, delete=False)
+        tmp.write(img_data)
+        tmp.close()
+        image_path = Path(tmp.name)
+        image_url_override = _storage.s3_public_url(s3_key)
+    else:
+        candidates = list((config.DATA_DIR / "images").glob(f"{sha}.*"))
+        if not candidates:
+            raise HTTPException(status_code=404, detail="image not found; call /upload/check first")
+        image_path = candidates[0]
+        image_url_override = None
+
     try:
-        point_id, ok = await ingest_upload(image_path, sha, body.title)
+        point_id, ok = await ingest_upload(image_path, sha, body.title, image_url_override)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"ingest failed: {exc}")
+    finally:
+        if config.S3_ENABLED and image_path.exists():
+            os.unlink(image_path)
     if not ok:
         raise HTTPException(status_code=502, detail="ingest quarantined; check server logs")
 
