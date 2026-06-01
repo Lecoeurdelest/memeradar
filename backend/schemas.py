@@ -66,6 +66,8 @@ class MemeHit(BaseModel):
     subtext_context: str
     lang: str = "en"
     lineage: LineageNode
+    template_drift_score: float | None = None
+    trending_mutation: bool = False
 
 
 class SearchResponse(BaseModel):

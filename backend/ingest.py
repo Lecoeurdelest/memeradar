@@ -174,8 +174,8 @@ async def ingest_upload(
     return point_id, ok
 
 
-async def run(workers: int, limit: int | None, delay: float) -> None:
-    manifest_path = config.DATA_DIR / "memes.json"
+async def run(workers: int, limit: int | None, delay: float, manifest: str | None = None) -> None:
+    manifest_path = Path(manifest) if manifest else config.DATA_DIR / "memes.json"
     if not manifest_path.exists():
         print(f"No manifest found at {manifest_path}")
         sys.exit(1)
@@ -224,8 +224,9 @@ def main() -> None:
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--delay", type=float, default=0.0)
+    parser.add_argument("--manifest", type=str, default=None)
     args = parser.parse_args()
-    asyncio.run(run(args.workers, args.limit, args.delay))
+    asyncio.run(run(args.workers, args.limit, args.delay, args.manifest))
 
 
 if __name__ == "__main__":

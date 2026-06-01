@@ -108,6 +108,8 @@ def _hit_from_payload(point_id: str, payload: dict, score: float, lineage: dict)
         "subtext_context": payload.get("subtext_context", ""),
         "lang": "en",
         "lineage": lineage,
+        "template_drift_score": payload.get("template_drift_score"),
+        "trending_mutation": bool(payload.get("trending_mutation", False)),
     }
 
 

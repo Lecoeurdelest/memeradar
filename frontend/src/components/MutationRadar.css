@@ -299,6 +299,54 @@
   color: var(--muted);
 }
 
+.radar-lineage-item-clickable {
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.radar-lineage-item-clickable:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.radar-lineage-item-clickable:hover .radar-node-label {
+  color: #fff;
+}
+
+.radar-node-clickable {
+  cursor: pointer;
+  transition: r 0.15s, opacity 0.15s;
+}
+
+.radar-node-clickable:hover {
+  opacity: 0.75;
+}
+
+.radar-node-loading {
+  opacity: 0.5;
+  animation: radar-pulse 0.8s ease-in-out infinite alternate;
+}
+
+.radar-node-spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: radar-spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes radar-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes radar-pulse {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+
 @media (max-width: 900px) {
   .radar-panel {
     max-width: none;

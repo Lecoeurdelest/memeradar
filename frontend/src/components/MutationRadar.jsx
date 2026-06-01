@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import './MutationRadar.css'
 
 const DRIFT_ZONES = [
@@ -122,8 +123,21 @@ function scatterPoint(index, total) {
   return { x: 50 + Math.cos(angle) * 34, y: 50 + Math.sin(angle) * 34 }
 }
 
-function EvolutionTimeline({ template, variants }) {
+function EvolutionTimeline({ template, variants, onNodeClick }) {
+  const [loadingNode, setLoadingNode] = useState(null)
   const hasLineage = Boolean(template) || variants.length > 0
+  const clickable = typeof onNodeClick === 'function'
+
+  async function handleNodeClick(name) {
+    if (!clickable || loadingNode) return
+    setLoadingNode(name)
+    try {
+      await onNodeClick(name)
+    } finally {
+      setLoadingNode(null)
+    }
+  }
+
   return (
     <section className="radar-timeline">
       <header className="radar-section-head">
@@ -137,30 +151,50 @@ function EvolutionTimeline({ template, variants }) {
       ) : (
         <>
           <svg className="radar-scatter" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <circle className="radar-scatter-core" cx="50" cy="50" r="6" />
+            <circle
+              className={`radar-scatter-core${clickable ? ' radar-node-clickable' : ''}`}
+              cx="50" cy="50" r="6"
+              onClick={() => template && handleNodeClick(template)}
+            />
             {variants.map((variant, index) => {
               const point = scatterPoint(index, variants.length)
+              const isLoading = loadingNode === variant
               return (
-                <g key={`${variant}-${index}`}>
+                <g key={`${variant}-${index}`} onClick={() => handleNodeClick(variant)} style={{ cursor: clickable ? 'pointer' : 'default' }}>
                   <line className="radar-scatter-link" x1="50" y1="50" x2={point.x} y2={point.y} />
-                  <circle className="radar-scatter-dot" cx={point.x} cy={point.y} r="3" />
+                  <circle
+                    className={`radar-scatter-dot${isLoading ? ' radar-node-loading' : ''}${clickable ? ' radar-node-clickable' : ''}`}
+                    cx={point.x} cy={point.y} r={isLoading ? 4.5 : 3}
+                  />
                 </g>
               )
             })}
           </svg>
           <ol className="radar-lineage">
-            <li className="radar-lineage-root">
+            <li
+              className={`radar-lineage-root${clickable ? ' radar-lineage-item-clickable' : ''}`}
+              onClick={() => template && handleNodeClick(template)}
+            >
               <span className="radar-node-dot" />
               <span className="radar-node-label">{template ?? 'unknown template'}</span>
               <span className="radar-node-tag">canonical</span>
+              {loadingNode === template && <span className="radar-node-spinner" />}
             </li>
-            {variants.map((variant, index) => (
-              <li key={`${variant}-${index}`}>
-                <span className="radar-node-dot" />
-                <span className="radar-node-label">{variant}</span>
-                <span className="radar-node-tag">mutation</span>
-              </li>
-            ))}
+            {variants.map((variant, index) => {
+              const isLoading = loadingNode === variant
+              return (
+                <li
+                  key={`${variant}-${index}`}
+                  className={clickable ? 'radar-lineage-item-clickable' : ''}
+                  onClick={() => handleNodeClick(variant)}
+                >
+                  <span className="radar-node-dot" />
+                  <span className="radar-node-label">{variant}</span>
+                  <span className="radar-node-tag">mutation</span>
+                  {isLoading && <span className="radar-node-spinner" />}
+                </li>
+              )
+            })}
           </ol>
         </>
       )}
@@ -168,7 +202,7 @@ function EvolutionTimeline({ template, variants }) {
   )
 }
 
-export default function MutationRadar({ model }) {
+export default function MutationRadar({ model, onNodeClick }) {
   if (!model) return null
   return (
     <aside className="radar-panel" aria-label="Meme Mutation Radar">
@@ -179,7 +213,7 @@ export default function MutationRadar({ model }) {
       ) : (
         <VelocityGraph velocity={model.velocity} threshold={model.threshold} />
       )}
-      <EvolutionTimeline template={model.template} variants={model.variants} />
+      <EvolutionTimeline template={model.template} variants={model.variants} onNodeClick={onNodeClick} />
     </aside>
   )
 }

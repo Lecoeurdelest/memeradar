@@ -165,6 +165,8 @@ async def _assemble(points, lang: str) -> list[dict]:
             "subtext_context": (caption or {}).get("subtext_context") or p.payload.get("subtext_context", ""),
             "lang": lang,
             "lineage": lineage,
+            "template_drift_score": p.payload.get("template_drift_score"),
+            "trending_mutation": bool(p.payload.get("trending_mutation", False)),
         })
 
     return results

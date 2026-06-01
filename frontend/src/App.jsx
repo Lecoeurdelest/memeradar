@@ -14,6 +14,7 @@ export default function App() {
   const [uploadState, setUploadState] = useState(null)
   const [uploadBusy, setUploadBusy] = useState(false)
   const [mutationIndex, setMutationIndex] = useState(() => buildMutationIndex(null))
+  const [nodePreview, setNodePreview] = useState(null)
   const debounceRef = useRef(null)
   const lastQuery = useRef('')
   const fileInputRef = useRef(null)
@@ -26,6 +27,14 @@ export default function App() {
     setTimeout(() => setToast(null), 4000)
   }
 
+  function sortByTimeline(arr) {
+    return [...arr].sort((a, b) => {
+      const aV = a.lineage?.variants?.length ?? 0
+      const bV = b.lineage?.variants?.length ?? 0
+      return bV - aV
+    })
+  }
+
   async function go(visualVal, queryVal, langVal) {
     const qTrimmed = (queryVal ?? q).trim()
     if (!qTrimmed) return
@@ -33,7 +42,7 @@ export default function App() {
     setLoading(true)
     try {
       const data = await searchMemes({ q: qTrimmed, k: 24, visualWeight: visualVal ?? visual, ironyWeight: +(1 - (visualVal ?? visual)).toFixed(2), lang: langVal ?? lang })
-      setResults(data.results || [])
+      setResults(sortByTimeline(data.results || []))
     } catch (err) {
       showToast('Search failed — backend error. Try again.')
     } finally {
@@ -52,7 +61,7 @@ export default function App() {
     setQ('')
     try {
       const data = await randomMemes({ k: 24, lang: langVal ?? lang })
-      setResults(data.results || [])
+      setResults(sortByTimeline(data.results || []))
     } catch (err) {
       showToast('Could not load memes — backend error.')
     } finally {
@@ -121,6 +130,23 @@ export default function App() {
   function onPickMatch(match) {
     setUploadState(null)
     setActive(match)
+  }
+
+  async function onTimelineNodeClick(templateName) {
+    try {
+      const data = await searchMemes({ q: templateName, k: 1, template: templateName, lang })
+      const hit = data.results?.[0]
+      if (hit) {
+        setNodePreview({ meme: hit, templateName })
+      } else {
+        const fallback = await searchMemes({ q: templateName, k: 1, lang })
+        const fallbackHit = fallback.results?.[0]
+        if (fallbackHit) setNodePreview({ meme: fallbackHit, templateName })
+        else showToast(`No memes found for "${templateName}"`)
+      }
+    } catch {
+      showToast('Could not load meme for this template.')
+    }
   }
 
   return (
@@ -202,7 +228,29 @@ export default function App() {
               <p className="subtext">{active.subtext_context}</p>
               <a href={active.permalink} target="_blank" rel="noreferrer">source ↗</a>
             </div>
-            {radarModel && <MutationRadar model={radarModel} />}
+            {radarModel && <MutationRadar model={radarModel} onNodeClick={onTimelineNodeClick} />}
+          </div>
+        </div>
+      )}
+
+      {nodePreview && (
+        <div className="node-preview-backdrop" onClick={() => setNodePreview(null)}>
+          <div className="node-preview" onClick={(e) => e.stopPropagation()}>
+            <button className="node-preview-close" onClick={() => setNodePreview(null)} aria-label="Close">✕</button>
+            <div className="node-preview-tag">{nodePreview.templateName}</div>
+            <div className="node-preview-body">
+              <img src={resolveImageUrl(nodePreview.meme.image_url)} alt={nodePreview.meme.title} />
+              <div className="node-preview-info">
+                <h4>{nodePreview.meme.title}</h4>
+                <p className="node-preview-joke">{nodePreview.meme.core_joke}</p>
+                <p className="node-preview-psych"><em>{nodePreview.meme.psychological_state}</em></p>
+                <div className="node-preview-actions">
+                  <button className="node-preview-view" onClick={() => { setActive(nodePreview.meme); setNodePreview(null) }}>
+                    View Full ↗
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
