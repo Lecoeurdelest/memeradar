@@ -212,6 +212,16 @@ def scrape(limit: int, out_dir: Path, sleep: float, max_pages: int) -> list[dict
     records: list[dict[str, str | int | None]] = []
     seen_urls: set[str] = set()
 
+    index_path = out_dir / "index.json"
+    if index_path.exists():
+        existing = json.loads(index_path.read_text(encoding="utf-8"))
+        for rec in existing:
+            url = rec.get("url")
+            if url:
+                seen_urls.add(url)
+        records = existing
+        print(f"loaded {len(records)} existing entries; will skip duplicates")
+
     for page in range(1, max_pages + 1):
         entries = listing_entries(session, page, sleep)
         if not entries:
