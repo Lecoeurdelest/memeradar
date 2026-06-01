@@ -18,15 +18,19 @@ from backend import config
 from backend.clients import (
     close_all,
     ensure_collection,
+    ensure_mutation_indexes,
     ensure_sha256_index,
+    neo4j_list_template_metrics,
     qdrant_scroll_by_sha256,
     tl_embed_image_file,
 )
 from backend.ingest import ingest_upload
 from backend.schemas import (
     MemeHit,
+    MutationRadarResponse,
     SearchQueryParams,
     SearchResponse,
+    TemplateMutation,
     UploadCheckResponse,
     UploadIngestRequest,
 )
@@ -39,6 +43,7 @@ from backend import storage as _storage
 async def lifespan(app: FastAPI):
     await ensure_collection()
     await ensure_sha256_index()
+    await ensure_mutation_indexes()
     yield
     await close_all()
 
@@ -248,6 +253,40 @@ async def random_endpoint(
         count=len(results),
         weights={"visual": 1.0, "irony": 0.0},
         results=results,
+    )
+
+
+@app.get("/mutations", response_model=MutationRadarResponse)
+async def mutations_endpoint(trending_only: Annotated[bool, Query()] = False):
+    try:
+        rows = await neo4j_list_template_metrics()
+    except Exception:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "graph_unavailable", "detail": "graph store unreachable"},
+        )
+
+    templates: list[TemplateMutation] = []
+    for row in rows:
+        member_count = int(row.get("member_count") or 0)
+        velocity = float(row.get("velocity") or 0.0)
+        accumulating = member_count < config.MUTATION_MIN_MEMBERS
+        trending = (not accumulating) and velocity > config.MUTATION_VELOCITY_THRESHOLD
+        if trending_only and not trending:
+            continue
+        templates.append(TemplateMutation(
+            template=row["template"],
+            member_count=member_count,
+            velocity=velocity,
+            trending_mutation=trending,
+            accumulating_baseline=accumulating,
+        ))
+
+    return MutationRadarResponse(
+        count=len(templates),
+        threshold=config.MUTATION_VELOCITY_THRESHOLD,
+        min_members=config.MUTATION_MIN_MEMBERS,
+        templates=templates,
     )
 
 

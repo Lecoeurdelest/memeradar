@@ -227,6 +227,46 @@ Goal: captions for every ingested meme translated into ES, FR, JA, PT, VI and st
 
 ---
 
+## Sprint 5 — Meme Mutation Radar
+
+Goal: quantify each template's semantic/visual "drift velocity" relative to its spherical-mean centroid over time, computed in a decoupled batch step so the hot search path never runs dense-vector arithmetic. Spec: [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping) (payload contract) + [implementation-notes.md](implementation-notes.md) (full KSP 1 contract and unspec'd decisions).
+
+### Feature F-5.1 — Meme Mutation Radar Implementation
+
+- [x] **Feature: Meme Mutation Radar Implementation** ✅ (live end-to-end verified 2026-06-01)
+  - [x] **T-5.1.1** — Schema migration: Qdrant integer index on `indexed_at`, keyword index on `template`, float payload `template_drift_score`, boolean filter `trending_mutation`; Neo4j `:MemeTemplate` gains `centroid_visual`, `historical_centroid_visual`, `velocity`. Materialized by `backend/clients.py::ensure_mutation_indexes` (idempotent) + Neo4j upsert helpers.
+    - Spec: [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping)
+    - Test: [TC-VEC-003](TESTS.md#2-vector-search--fusion-tests)
+  - [x] **T-5.1.2** — Background execution script `scripts/compute_mutation_metrics.py`: scroll template members via the `template` index, compute centroid, write `centroid_visual` to Neo4j, upsert per-point `template_drift_score` to Qdrant, and flip `trending_mutation` when 7-day drift velocity exceeds threshold. Strict async; bounded `Semaphore` over the per-member update pass per [CLAUDE.md §3.2](CLAUDE.md#32-async-processing-loops).
+    - Spec: [CLAUDE.md §3.2](CLAUDE.md#32-async-processing-loops), [CLAUDE.md §3.6](CLAUDE.md#36-vendor-boundaries)
+    - Test: [TC-VEC-003](TESTS.md#2-vector-search--fusion-tests), [TC-FAIL-009](TESTS.md#6-failure-boundary-assertions)
+  - [x] **T-5.1.3** — Spherical-mean mathematics module `backend/mutation.py`: `normalize → mean → renormalize` producing a unit-length centroid; cosine distance with zero-vector guard. Pure math, no vendor SDK.
+    - Spec: [CLAUDE.md §3.1](CLAUDE.md#31-comment--docstring-prohibition-application-code)
+    - Test: [TC-VEC-003](TESTS.md#2-vector-search--fusion-tests)
+  - [x] **T-5.1.4** — Small-sample guardrails: templates with `< MUTATION_MIN_MEMBERS` (5) force `velocity = 0.0` and `trending_mutation = false`, bypass velocity computation, and are flagged "accumulating baseline data".
+    - Spec: [implementation-notes.md](implementation-notes.md)
+    - Test: [TC-FAIL-009](TESTS.md#6-failure-boundary-assertions)
+
+### Feature F-5.2 — Meme Mutation Radar Dashboard Panel (Frontend)
+
+- [ ] **Frontend: Meme Mutation Radar Dashboard Panel** — Meme-detail side panel visualizing template drift, mutation velocity, and lineage from the pre-materialized `/mutations` cache. New modules: `frontend/src/components/MutationRadar.jsx` + `MutationRadar.css`; payload mappers added to `frontend/src/api.js`. Spec: [CLAUDE.md §1 frontend tree](CLAUDE.md#1-repository-file-tree), [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping). See [implementation-notes-ui.html](implementation-notes-ui.html).
+  - [ ] **T-5.2.1** — UI asset binding: extend the `api.js` client layer to fetch `/mutations` and map `template_drift_score`, `trending_mutation`, and `lineage_cache` (`template`, `variants`) into a normalized radar model with null-lineage fallbacks.
+    - Spec: [CLAUDE.md §2.3 invariant 5](CLAUDE.md#23-fastapi-search-schema)
+    - Test: [TC-UI-008](TESTS.md#4-live-ui-integration-tests)
+  - [ ] **T-5.2.2** — Trend Velocity badge component: prominent "Trending Mutation" (High Velocity) vs "Stable Format" badge driven by `trending_mutation`; Drift Vector gauge over the `0.0 (Canonical) → 1.0 (Extreme Drift)` range.
+    - Spec: [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping)
+    - Test: [TC-UI-008](TESTS.md#4-live-ui-integration-tests)
+  - [ ] **T-5.2.3** — Small-sample banner logic: when the selected template is accumulating baseline (`member_count < MUTATION_MIN_MEMBERS`, surfaced as `velocity == 0.0`), replace the live velocity graph with the "Accumulating baseline data" notice.
+    - Spec: [implementation-notes-ui.html](implementation-notes-ui.html)
+    - Test: [TC-UI-007](TESTS.md#4-live-ui-integration-tests)
+  - [ ] **T-5.2.4** — State integration: fetch the mutation index once on mount, derive the radar model from the selected meme, and degrade gracefully (null-lineage values) when `/mutations` errors per [CLAUDE.md §2.3 invariant 5](CLAUDE.md#23-fastapi-search-schema).
+    - Spec: [CLAUDE.md §2.3 invariant 5](CLAUDE.md#23-fastapi-search-schema)
+    - Test: [TC-UI-007](TESTS.md#4-live-ui-integration-tests), [TC-UI-008](TESTS.md#4-live-ui-integration-tests)
+
+**Sprint 5 exit criteria**: ✅ `python scripts/compute_mutation_metrics.py` completes without error against a populated collection; `GET /mutations` returns per-template velocity with trending flags; `backend/mutation.py` emits a unit-length centroid (TC-VEC-003); small-sample templates default to zero velocity (TC-FAIL-009). **Met 2026-06-01** against live Qdrant Cloud (106 pts) + Neo4j Aura (103 templates): batch ran 0 errors, `/mutations` round-trip returned 103 accumulating templates, live centroid read-back L2==1.0. Computed/trending path verified via in-memory real-Qdrant integration + a MIN=1 live verification run (see [progress.md](progress.md)).
+
+---
+
 ## Cross-Cutting (Spans All Sprints)
 
 - [ ] **T-X.1** — CI runs lint + test matrix on every PR. Lint includes the no-comments check from [CLAUDE.md §3.1](CLAUDE.md#31-comment--docstring-prohibition-application-code).

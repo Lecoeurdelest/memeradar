@@ -72,4 +72,5 @@ Before you stop:
 - `progress.md` — append-only session log
 - `session-handoff.md` — populated only when handing off mid-feature
 - `init.ps1` / `init.sh` — idempotent bootstrap + health check
+- `start.ps1` / `start.sh` — single backend startup command (`uv sync` + uvicorn on `:8000`; `-BuildFrontend`/`--build-frontend` to also serve the SPA)
 - `pyproject.toml` + `uv.lock` + `.python-version` — Python env contract

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Implementation Notes — KSP 1 Frontend UI</title>
+    <style>
+      body { max-width: 880px; margin: 40px auto; padding: 0 20px; font-family: ui-sans-serif, system-ui, sans-serif; line-height: 1.55; color: #1c1c22; }
+      h1 { font-size: 28px; }
+      h2 { margin-top: 36px; border-bottom: 2px solid #ff3d7f; padding-bottom: 6px; }
+      h3 { margin-top: 24px; }
+      code { background: #f2f2f5; padding: 2px 6px; border-radius: 4px; font-size: 90%; }
+      ul { padding-left: 22px; }
+      li { margin: 8px 0; }
+      .muted { color: #6b6b78; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <h1>Implementation Notes — KSP 1 Meme Mutation Radar (Frontend)</h1>
+    <p class="muted">
+      Running log for the Meme Mutation Radar detail-panel UI. Captures every styling, state, and
+      component decision not spelled out in the spec. Component source carries no comments per
+      <code>CLAUDE.md §3.1</code>; all such commentary lives here and in
+      <code>implementation-notes.md</code>.
+    </p>
+
+    <h2>Frontend UI &amp; Component Refinements</h2>
+    <ul>
+      <li>
+        <strong>Styling, charts &amp; state hooks.</strong> The radar panel is a self-contained
+        <code>frontend/src/components/MutationRadar.jsx</code> composed of four semantic
+        sub-components — <code>TrendVelocityBadge</code>, <code>DriftVectorGauge</code>,
+        <code>VelocityGraph</code>/<code>SmallSampleNotice</code>, and
+        <code>EvolutionTimeline</code>. No charting dependency was added: the drift gauge and
+        velocity graph are pure CSS meters (gradient track + absolutely-positioned thumb/threshold
+        marker), and the evolution "vector cluster" is a hand-rolled inline <code>&lt;svg&gt;</code>
+        scatter — keeping the bundle untouched (<code>package.json</code> unchanged) per the
+        "lightweight" directive. Styling is scoped to <code>.radar-*</code> classes in
+        <code>MutationRadar.css</code> and reuses the existing theme tokens
+        (<code>--bg</code>, <code>--fg</code>, <code>--muted</code>, <code>--accent</code>,
+        <code>--card</code>) so the panel is visually native to the app. State is a single
+        <code>useState</code> mutation index hydrated by one <code>useEffect</code> fetch of
+        <code>/mutations</code> on mount; the per-meme radar model is <em>derived</em> (not stored)
+        from the selected hit via <code>toMutationRadarModel(active, mutationIndex)</code>, so no
+        extra re-render churn and no stale duplication of telemetry. The API client layer
+        (<code>api.js</code>) owns all payload mapping: <code>fetchMutations</code>,
+        <code>buildMutationIndex</code>, and <code>toMutationRadarModel</code> normalize
+        <code>template_drift_score</code>, <code>trending_mutation</code>, and
+        <code>lineage_cache</code> (accepting both the spec name <code>lineage_cache</code> and the
+        live backend field <code>lineage</code>).
+      </li>
+      <li>
+        <strong>Small-sample conditional rendering.</strong> The guardrail is data-driven, not a
+        magic number in the view. <code>buildMutationIndex</code> reads <code>min_members</code>
+        from the <code>/mutations</code> response (default 5), and
+        <code>toMutationRadarModel</code> sets <code>accumulatingBaseline</code> when the matched
+        template's <code>accumulating_baseline</code> flag is true <em>or</em>
+        <code>member_count &lt; min_members</code> (this is the <code>velocity == 0.0</code>
+        guardrail surfaced by the backend for <code>N &lt; 5</code>). The container then renders a
+        strict either/or: <code>accumulatingBaseline ? &lt;SmallSampleNotice/&gt; :
+        &lt;VelocityGraph/&gt;</code> — the live velocity graph is <em>replaced</em>, never merely
+        hidden, satisfying the spec. The banner copy is the exact mandated string
+        ("Accumulating baseline data: This template requires at least 5 instances for drift
+        telemetry"), with the threshold count interpolated from <code>minMembers</code> so it stays
+        correct if the backend constant changes. This path is asserted by
+        <code>TC-UI-007</code> (see ID-collision note below).
+      </li>
+      <li>
+        <strong>Responsive layout &amp; integration.</strong> The radar mounts as a third
+        <code>&lt;aside&gt;</code> column inside the existing meme-detail modal
+        (<code>.modal-inner</code>), which became <code>flex-wrap: wrap</code> with a raised
+        <code>max-width</code> (1000→1240px) and a vertical scroll cap (<code>max-height: 88vh</code>).
+        The image is now <code>flex: 0 0 auto</code> (≤440px), the text column
+        <code>flex: 1 1 280px</code>, and the panel <code>flex: 1 1 300px</code> (≤360px),
+        so on wide viewports it reads as a side panel and on tablet widths it wraps gracefully. A
+        <code>@media (max-width: 900px)</code> query collapses the modal to a single stacked column
+        with a full-width image, and the panel drops its max-width. The stale <code>.lineage</code>
+        block (and its CSS rule) was retired because the <code>EvolutionTimeline</code> now renders
+        template + variants, avoiding duplicate lineage UI.
+      </li>
+      <li>
+        <strong>Graceful degradation (degradable-architecture rule).</strong> Every external read
+        fails soft. A failed/initial <code>/mutations</code> fetch resolves to
+        <code>buildMutationIndex(null)</code> (empty index, <code>ok: false</code>); an unmatched
+        template yields <code>hasTelemetry: false</code>. In that state the badge shows
+        "Stable Format", the drift gauge shows "Drift telemetry unavailable" (the standard
+        null-lineage value), the velocity slot shows "Mutation telemetry unavailable", and the
+        timeline falls back to the hit's own <code>template</code>/variants or "No lineage
+        recorded". The panel never throws on missing data, mirroring the backend's 200-with-null
+        contract (<code>CLAUDE.md §2.3 invariant 5</code>).
+      </li>
+      <li>
+        <strong>Drift-gauge scale decision.</strong> The spec labels the gauge
+        <code>0.0 (Canonical) → 1.0 (Extreme Drift)</code>, but the backend cosine
+        <code>template_drift_score</code> is mathematically bounded to <code>[0, 2]</code>
+        (see <code>implementation-notes.md</code>). The gauge therefore renders the spec's 0–1
+        labeled scale and <em>clamps</em> the fill/thumb to <code>[0, 1]</code> while displaying the
+        raw numeric value, plus a three-zone readout (Canonical / Drifting / High-Irony Mutation).
+        Because the current <code>/search</code> <code>MemeHit</code> does not yet surface
+        per-meme <code>template_drift_score</code>, the client maps it defensively and shows the
+        null state until the backend wires it through — no fabricated value.
+      </li>
+      <li>
+        <strong>Velocity graph as a scalar meter.</strong> The <code>/mutations</code> payload
+        exposes a single <code>velocity</code> scalar (centroid displacement), not a time series, so
+        the "live velocity graph" is an honest horizontal meter scaled against the trending
+        <code>threshold</code> (with a threshold tick and a "hot" accent state above it) rather than
+        a fake sparkline. <code>TC-UI-008</code> asserts the badge state derived from
+        <code>trending_mutation</code>.
+      </li>
+      <li>
+        <strong>Test-ID collision (TC-UI-001/002 → TC-UI-007/008).</strong> The spec requested test
+        IDs <code>TC-UI-001</code> and <code>TC-UI-002</code>, but both already exist in
+        <code>TESTS.md</code> (cold-start search and grid responsiveness) and are referenced by the
+        traceability matrix. Following the precedent already set for
+        <code>TC-VEC-002</code>→<code>TC-VEC-003</code> and
+        <code>TC-FAIL-007</code>→<code>TC-FAIL-009</code> in <code>implementation-notes.md</code>,
+        the new cases land at the next free IDs — <code>TC-UI-007</code> (accumulating-baseline
+        banner) and <code>TC-UI-008</code> (Trend Velocity badge) — with the coverage dashboard and
+        matrix updated accordingly.
+      </li>
+      <li>
+        <strong>Scatter coordinates are illustrative.</strong> The API exposes variant
+        <em>names</em> only, not per-variant vectors, so the mini scatter places the template at a
+        fixed core and distributes variants deterministically around a ring by index. It is a
+        legible "vector cluster" affordance, not a projection of real embeddings — documented here
+        so it is not mistaken for true 2-D drift coordinates.
+      </li>
+    </ul>
+    <p class="muted">
+      Build note: the Vite/esbuild bundler could not be exercised in the authoring sandbox
+      (subprocess spawn hangs); files were validated by review. Run <code>npm run build</code> in
+      <code>frontend/</code> on a normal host to confirm the production bundle.
+    </p>
+  </body>
+</html>

@@ -46,6 +46,7 @@ else
 fi
 
 echo "=== init complete ==="
-echo "Start app:"
-echo "  uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000"
+echo "Start backend (single command):"
+echo "  ./start.sh                   # uv sync + uvicorn on :8000"
+echo "Optional dev UI:"
 echo "  (cd frontend && npm run dev)"

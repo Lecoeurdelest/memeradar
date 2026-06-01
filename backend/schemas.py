@@ -27,6 +27,9 @@ class QdrantPointPayload(BaseModel):
     subtext_context: str
     search_dense_explanations: str
     image_sha256: str | None = Field(default=None, description="SHA-256 of the source image bytes; populated for user uploads")
+    indexed_at: int | None = Field(default=None, description="Unix timestamp when the point was ingested; integer-indexed for mutation-radar time windows")
+    template_drift_score: float | None = Field(default=None, description="Cosine distance of this meme's visual vector from its template spherical-mean centroid; written by the mutation-radar batch step")
+    trending_mutation: bool = Field(default=False, description="Boolean filter flag raised by the mutation-radar batch step when the template drift velocity exceeds the experimental threshold")
 
 
 class SearchQueryParams(BaseModel):
@@ -70,6 +73,21 @@ class SearchResponse(BaseModel):
     count: int
     weights: dict[Literal["visual", "irony"], float]
     results: list[MemeHit]
+
+
+class TemplateMutation(BaseModel):
+    template: str
+    member_count: int
+    velocity: float
+    trending_mutation: bool
+    accumulating_baseline: bool
+
+
+class MutationRadarResponse(BaseModel):
+    count: int
+    threshold: float
+    min_members: int
+    templates: list[TemplateMutation]
 
 
 class UploadCheckResponse(BaseModel):

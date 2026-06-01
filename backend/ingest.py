@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import json
 import sys
+import time
 from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
@@ -110,6 +111,7 @@ async def ingest_one(
             "psychological_state": decoded.psychological_state,
             "subtext_context": decoded.subtext_context,
             "search_dense_explanations": decoded.search_dense_explanations,
+            "indexed_at": int(time.time()),
         }
         if entry.get("image_sha256"):
             payload["image_sha256"] = entry["image_sha256"]

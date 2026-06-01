@@ -66,6 +66,20 @@ node --version
 
 All six must exit 0. Verified by [TESTS.md §1 — TC-ENV-001](TESTS.md#1-pipeline-extraction-tests).
 
+### 1.4 Managed cloud datastores (alternative to local Qdrant + Neo4j)
+
+You can point MemeRadar at **Qdrant Cloud** and **Neo4j Aura** instead of running the local binaries — the only contract is the connection settings in `backend/.env`. This repo's reference deployment runs this way:
+
+```bash
+# backend/.env
+QDRANT_URL=https://<cluster-id>.<region>.aws.cloud.qdrant.io
+QDRANT_API_KEY=<qdrant-cloud-api-key>
+NEO4J_URI=neo4j+s://<db-id>.databases.neo4j.io
+NEO4J_PASSWORD=<aura-password>
+```
+
+When using managed cloud you **skip the Qdrant/Neo4j install rows above and Phase 1's `qdrant` / `neo4j console` terminals** — only the FastAPI process (and, in dev, the Vite server) runs locally. The "No Docker" rule ([CLAUDE.md §3.5](CLAUDE.md#3-system-rules--engineering-constraints)) governs repo files, not where your datastores live.
+
 ---
 
 ## 2. Environment Configuration Interface
@@ -93,6 +107,9 @@ Single source of truth lives in `backend/.env`. Schema is enforced at boot by `b
 | `NEO4J_PASSWORD` | yes | — | Auth password | `backend/clients.py` |
 | `COGNEE_LLM_API_KEY` | no | falls back to `MISTRAL_API_KEY` | KG enrichment LLM | `backend/enrich_cognee.py` |
 | `DATA_DIR` | no | `./data` | Local asset mount | `backend/config.py` |
+| `MUTATION_MIN_MEMBERS` | no | `5` | Min template members before drift is computed (else `accumulating baseline`) | `scripts/compute_mutation_metrics.py` |
+| `MUTATION_VELOCITY_THRESHOLD` | no | `0.15` | Drift velocity above which a template is flagged `trending_mutation` | `scripts/compute_mutation_metrics.py` |
+| `MUTATION_HISTORICAL_WINDOW_DAYS` | no | `7` | Days before a centroid ages into the historical baseline | `scripts/compute_mutation_metrics.py` |
 
 The boot validation contract is specified in [CLAUDE.md §3.4 Configuration Loading](CLAUDE.md#3-system-rules--engineering-constraints). Validated by [TESTS.md §1 — TC-ENV-002](TESTS.md#1-pipeline-extraction-tests).
 
@@ -126,12 +143,23 @@ neo4j console
 uv run uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
+**One-command backend start.** The third line — plus `uv sync` — is packaged into a single startup command:
+
+```bash
+./start.ps1            # Windows (PowerShell)
+./start.sh             # bash
+```
+
+It runs `uv sync` then launches `uvicorn backend.main:app` on `:8000`. Flags: `-Port 9000` / `--port=9000`, hot-reload with `-Reload` / `--reload`, and `-BuildFrontend` / `--build-frontend` to also build the SPA into `frontend/dist` and serve UI + API on the one port. (Without that flag the SPA is served only if `frontend/dist` already exists — see [Phase 3](#phase-3--serve-the-react-ui) for the dev UI.)
+
+> **Using managed cloud ([§1.4](#14-managed-cloud-datastores-alternative-to-local-qdrant--neo4j))?** `./start.ps1` is the *only* process you run — Qdrant Cloud and Neo4j Aura are already up, there are no local `qdrant` / `neo4j console` terminals, and the local `healthz` probes below do not apply.
+
 Health checks (a fourth terminal):
 
 ```bash
-curl -s http://localhost:6333/healthz
-curl -s -u neo4j:changeme http://localhost:7474
-curl -s http://localhost:8000/health
+curl -s http://localhost:6333/healthz                 # local Qdrant only
+curl -s -u neo4j:changeme http://localhost:7474       # local Neo4j only
+curl -s http://localhost:8000/health                  # always — expect {"status":"ok"}
 ```
 
 ### Phase 2 — Crawl and ingest
@@ -160,7 +188,26 @@ echo "VITE_API=http://localhost:8000" > .env
 npm run dev
 ```
 
-Open `http://localhost:5173`.
+Open `http://localhost:5173`. (Vite auto-increments to `5174`+ if `5173` is taken.)
+
+### Phase 4 — Mutation Radar (optional)
+
+Maps to [TASKS.md Sprint 5 → F-5.1](TASKS.md#sprint-5--meme-mutation-radar). Quantifies each template's visual **drift velocity** relative to its spherical-mean centroid, in a decoupled batch step so the hot `/search` path never runs dense-vector arithmetic.
+
+```bash
+uv run python scripts/compute_mutation_metrics.py
+```
+
+The batch computes a spherical-mean `centroid_visual` per template (→ Neo4j), writes each point's `template_drift_score` + `trending_mutation` flag (→ Qdrant), and raises `trending_mutation` when a template's drift velocity over the last `MUTATION_HISTORICAL_WINDOW_DAYS` exceeds `MUTATION_VELOCITY_THRESHOLD`. Templates with fewer than `MUTATION_MIN_MEMBERS` members are held as `accumulating baseline` (velocity `0.0`). It makes **no embedding-API calls**, so it is safe and cheap to re-run.
+
+Read the pre-computed metrics (graph-only — no dense arithmetic on the hot path):
+
+```bash
+curl -s 'http://localhost:8000/mutations' | python -m json.tool
+curl -s 'http://localhost:8000/mutations?trending_only=true' | python -m json.tool
+```
+
+`GET /mutations` returns one row per template (`member_count`, `velocity`, `trending_mutation`, `accumulating_baseline`) plus the active `threshold` and `min_members`.
 
 ---
 

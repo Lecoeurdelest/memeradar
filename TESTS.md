@@ -23,9 +23,9 @@ Live counters. Update alongside any test add/remove.
  
 | Metric | Count |
 |---|---|
-| **Total test cases** | **55** |
+| **Total test cases** | **59** |
 | Passing (`[x]`) | 0 |
-| Outstanding (`[ ]`) | 55 |
+| Outstanding (`[ ]`) | 59 |
 | Pass rate | 0% |
  
 ### By severity
@@ -33,28 +33,28 @@ Live counters. Update alongside any test add/remove.
 | Severity | Count | Passing | Outstanding |
 |---|---|---|---|
 | P0 — demo blockers | 30 | 0 | 30 |
-| P1 — demo degraders | 23 | 0 | 23 |
+| P1 — demo degraders | 27 | 0 | 27 |
 | P2 — polish | 2 | 0 | 2 |
  
 ### By type
  
 | Type | Count |
 |---|---|
-| Unit | 12 |
+| Unit | 13 |
 | Integration | 18 |
-| Manual | 11 |
-| Boundary | 14 |
+| Manual | 13 |
+| Boundary | 15 |
  
 ### By suite
  
 | Suite | Section | Count |
 |---|---|---|
 | Pipeline extraction | [§1](#1-pipeline-extraction-tests) | 14 |
-| Vector search & fusion | [§2](#2-vector-search--fusion-tests) | 12 |
+| Vector search & fusion | [§2](#2-vector-search--fusion-tests) | 13 |
 | Graph lineage | [§3](#3-graph-lineage-validation) | 5 |
-| Live UI integration | [§4](#4-live-ui-integration-tests) | 10 |
+| Live UI integration | [§4](#4-live-ui-integration-tests) | 12 |
 | Discipline & quality gates | [§5](#5-discipline--code-quality-gates) | 6 |
-| Failure boundaries | [§6](#6-failure-boundary-assertions) | 8 |
+| Failure boundaries | [§6](#6-failure-boundary-assertions) | 9 |
  
 ### Task coverage
  
@@ -62,8 +62,8 @@ Verifies that every actionable task in [TASKS.md](TASKS.md) is guarded by at lea
  
 | Metric | Value |
 |---|---|
-| Testable tasks in TASKS.md | 31 |
-| Tasks with ≥ 1 test | 31 |
+| Testable tasks in TASKS.md | 39 |
+| Tasks with ≥ 1 test | 39 |
 | **Task coverage** | **100%** |
 | Tasks intentionally untested | 1 (T-3.4.2 — README badges, cosmetic) |
  
@@ -72,7 +72,7 @@ Verifies that every actionable task in [TASKS.md](TASKS.md) is guarded by at lea
 Demo can be performed when:
  
 - 100% of P0 cases (30/30) are `[x]`.
-- ≥ 80% of P1 cases (≥ 19/23) are `[x]`.
+- ≥ 80% of P1 cases (≥ 22/27) are `[x]`.
 - All `TC-DEMO-*` cases (5 total) are `[x]`.
 ---
  
@@ -126,7 +126,7 @@ Validates crawl, OCR, and Mistral structured decode. **Suite total: 14** (P0: 6 
  
 ## 2. Vector Search & Fusion Tests
  
-Validates Qdrant schema, embedding pipeline, RRF correctness, and weighting behavior. **Suite total: 12** (P0: 10 · P1: 2 · P2: 0).
+Validates Qdrant schema, embedding pipeline, RRF correctness, and weighting behavior. **Suite total: 13** (P0: 10 · P1: 3 · P2: 0).
  
 - [ ] **TC-VEC-001** · P0 · Integration — Collection schema.
   - Asserts: `qdrant_client.get_collection("memeradar").config.params.vectors` contains exactly two named vectors, `visual` and `irony`, both size 1024, distance COSINE. Spec: [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping).
@@ -134,6 +134,10 @@ Validates Qdrant schema, embedding pipeline, RRF correctness, and weighting beha
 - [ ] **TC-VEC-002** · P0 · Integration — Idempotency.
   - Asserts: re-run `python -m backend.ingest` on the same `memes.json` twice — point count unchanged.
   - Tracks: [T-1.4.2](TASKS.md#feature-f-14--vector--graph-upsert).
+- [ ] **TC-VEC-003** · P1 · Unit — Spherical-mean centroid is unit length.
+  - Asserts: `backend.mutation.spherical_mean(cluster)` on a realistic sample cluster returns a vector with `L2 == 1.0` (within `1e-9`); each pass (per-vector normalize → arithmetic mean → renormalize) is applied. Spec: [CLAUDE.md §2.2](CLAUDE.md#22-qdrant-named-vector-point-mapping).
+  - Note: this is the KSP 1 centroid assertion the spec requested as "TC-VEC-002"; that ID was already taken by Idempotency, so it lands here as TC-VEC-003 — see [implementation-notes.md](implementation-notes.md).
+  - Tracks: [T-5.1.1](TASKS.md#feature-f-51--meme-mutation-radar-implementation), [T-5.1.3](TASKS.md#feature-f-51--meme-mutation-radar-implementation).
 - [ ] **TC-RRF-001** · P0 · Unit — Visual text query.
   - Asserts: `tl_text_embedding("panic")` returns 1024 floats in `[-1, 1]`.
   - Tracks: [T-2.2.1](TASKS.md#feature-f-22--dual-query-embedding).
@@ -189,7 +193,7 @@ Validates Neo4j MERGE discipline, Cognee enrichment, and lineage retrieval. **Su
  
 ## 4. Live UI Integration Tests
  
-Validates the React surface end-to-end against a running FastAPI. **Suite total: 10** (P0: 6 · P1: 4 · P2: 0).
+Validates the React surface end-to-end against a running FastAPI. **Suite total: 12** (P0: 6 · P1: 6 · P2: 0).
  
 - [ ] **TC-API-001** · P0 · Integration — Search response schema.
   - Asserts: `GET /search?q=panic` body deserializes into `SearchResponse` per [CLAUDE.md §2.3](CLAUDE.md#23-fastapi-search-schema); invariant `len(results) == count` holds.
@@ -215,6 +219,14 @@ Validates the React surface end-to-end against a running FastAPI. **Suite total:
 - [ ] **TC-UI-006** · P1 · Manual — Backend down.
   - Asserts: stop FastAPI mid-session; next search shows a toast "search service unavailable"; previous grid stays visible.
   - Tracks: [T-3.3.2](TASKS.md#feature-f-33--failure-surfaces).
+- [ ] **TC-UI-007** · P1 · Manual — Small-sample "accumulating baseline" banner.
+  - Asserts: open the Meme Mutation Radar panel for a meme whose template has `< MUTATION_MIN_MEMBERS` (5) members; the panel replaces the live velocity graph with the banner "Accumulating baseline data: This template requires at least 5 instances for drift telemetry." No velocity bar is shown.
+  - Note: this is the KSP 1 UI case the spec requested as "TC-UI-001"; that ID was already taken by Cold-start search, so it lands here as TC-UI-007 — see [implementation-notes-ui.html](implementation-notes-ui.html) (mirrors the TC-VEC / TC-FAIL renames in [implementation-notes.md](implementation-notes.md)).
+  - Tracks: [T-5.2.3](TASKS.md#feature-f-52--meme-mutation-radar-dashboard-panel-frontend), [T-5.2.4](TASKS.md#feature-f-52--meme-mutation-radar-dashboard-panel-frontend).
+- [ ] **TC-UI-008** · P1 · Manual — Trend Velocity badge state.
+  - Asserts: when the selected meme's template carries `trending_mutation == true`, the badge reads "Trending Mutation" (High Velocity) with the flame/graph treatment; when `false`, it reads "Stable Format". Driven by the mapped `trending_mutation` payload property.
+  - Note: this is the KSP 1 UI case the spec requested as "TC-UI-002"; that ID was already taken by Grid responsiveness, so it lands here as TC-UI-008 — see [implementation-notes-ui.html](implementation-notes-ui.html).
+  - Tracks: [T-5.2.1](TASKS.md#feature-f-52--meme-mutation-radar-dashboard-panel-frontend), [T-5.2.2](TASKS.md#feature-f-52--meme-mutation-radar-dashboard-panel-frontend).
 - [ ] **TC-DEMO-004** · P0 · Manual — RRF sweep visually.
   - Asserts: operator performs the 5-step sweep from [README.md §4.2](README.md#42-manual-rrf-sweep-procedure); top-1 shifts and at least 3 distinct memes appear as top-1 across the 5 steps.
   - Tracks: [T-3.2.1](TASKS.md#feature-f-32--weight-slider--rrf-visibility).
@@ -249,7 +261,7 @@ Enforces the engineering rules from [CLAUDE.md §3](CLAUDE.md#3-system-rules--en
  
 ## 6. Failure Boundary Assertions
  
-Edge-case behavior that protects the demo from disaster. **Suite total: 8** (P0: 3 · P1: 3 · P2: 2).
+Edge-case behavior that protects the demo from disaster. **Suite total: 9** (P0: 3 · P1: 4 · P2: 2).
  
 - [ ] **TC-FAIL-001** · P0 · Boundary — Dead Twelve Labs key.
   - Asserts: invalid `TL_API_KEY` at ingest time — affected memes land in a quarantine list; pipeline continues for the rest; no Qdrant point upserted with empty `visual` vector.
@@ -275,6 +287,10 @@ Edge-case behavior that protects the demo from disaster. **Suite total: 8** (P0:
 - [ ] **TC-FAIL-008** · P2 · Boundary — Image disappears between crawl and ingest.
   - Asserts: manually delete one image file; ingest task for that meme is quarantined; the rest proceed.
   - Tracks: [T-1.4.4](TASKS.md#feature-f-14--vector--graph-upsert).
+- [ ] **TC-FAIL-009** · P1 · Boundary — Small-sample mutation guardrail.
+  - Asserts: a template with `< 5` members run through `scripts/compute_mutation_metrics.py` defaults `velocity` to `0.0` and forces `trending_mutation = false` without raising; the template is flagged "accumulating baseline data" and velocity computation is bypassed. Spec: [implementation-notes.md](implementation-notes.md).
+  - Note: this is the KSP 1 guardrail the spec requested as "TC-FAIL-007"; that ID was already taken by Oversized query, so it lands here as TC-FAIL-009 — see [implementation-notes.md](implementation-notes.md).
+  - Tracks: [T-5.1.4](TASKS.md#feature-f-51--meme-mutation-radar-implementation).
 ---
  
 ## 7. Traceability Matrix
@@ -315,6 +331,14 @@ Reverse index — every task in [TASKS.md](TASKS.md) and its guarding tests.
 | [T-3.3.2](TASKS.md#feature-f-33--failure-surfaces) | TC-UI-006 | 1 |
 | [T-3.4.1](TASKS.md#feature-f-34--demo-capture) | TC-DEMO-005 | 1 |
 | [T-3.4.2](TASKS.md#feature-f-34--demo-capture) | — (cosmetic, no test required) | 0 |
+| [T-5.1.1](TASKS.md#feature-f-51--meme-mutation-radar-implementation) | TC-VEC-003 | 1 |
+| [T-5.1.2](TASKS.md#feature-f-51--meme-mutation-radar-implementation) | TC-VEC-003, TC-FAIL-009 | 2 |
+| [T-5.1.3](TASKS.md#feature-f-51--meme-mutation-radar-implementation) | TC-VEC-003 | 1 |
+| [T-5.1.4](TASKS.md#feature-f-51--meme-mutation-radar-implementation) | TC-FAIL-009 | 1 |
+| [T-5.2.1](TASKS.md#feature-f-52--meme-mutation-radar-dashboard-panel-frontend) | TC-UI-008 | 1 |
+| [T-5.2.2](TASKS.md#feature-f-52--meme-mutation-radar-dashboard-panel-frontend) | TC-UI-008 | 1 |
+| [T-5.2.3](TASKS.md#feature-f-52--meme-mutation-radar-dashboard-panel-frontend) | TC-UI-007 | 1 |
+| [T-5.2.4](TASKS.md#feature-f-52--meme-mutation-radar-dashboard-panel-frontend) | TC-UI-007, TC-UI-008 | 2 |
 | [T-X.1](TASKS.md#cross-cutting-spans-all-sprints) | TC-DISC-001 | 1 |
 | [T-X.2](TASKS.md#cross-cutting-spans-all-sprints) | TC-DISC-003 | 1 |
  

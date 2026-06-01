@@ -53,17 +53,22 @@ header p { color: var(--muted); margin: 4px 0 24px; }
   display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 10;
 }
 .modal-inner {
-  display: flex; gap: 24px; max-width: 1000px; width: 100%;
+  display: flex; gap: 24px; max-width: 1240px; width: 100%; flex-wrap: wrap;
+  max-height: 88vh; overflow-y: auto;
   background: var(--card); border-radius: 16px; padding: 24px;
 }
-.modal-inner img { max-width: 500px; max-height: 70vh; border-radius: 8px; }
-.modal-inner .info { flex: 1; }
+.modal-inner img { flex: 0 0 auto; max-width: 440px; max-height: 70vh; border-radius: 8px; }
+.modal-inner .info { flex: 1 1 280px; min-width: 260px; }
 .modal-inner h3 { margin-top: 0; }
-.modal-inner .lineage { background: #1f1f29; padding: 12px; border-radius: 8px; font-size: 14px; }
 .modal-inner .core-joke { color: var(--fg); font-size: 15px; margin: 0 0 8px; }
 .modal-inner .psych { color: var(--accent); font-size: 13px; margin: 0 0 8px; }
 .modal-inner .subtext { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
 .modal-inner a { color: var(--accent); display: inline-block; margin-top: 12px; }
+
+@media (max-width: 900px) {
+  .modal-inner { flex-direction: column; flex-wrap: nowrap; }
+  .modal-inner img { max-width: 100%; }
+}
 
 .empty {
   text-align: center; color: var(--muted); padding: 64px 0; font-size: 18px;

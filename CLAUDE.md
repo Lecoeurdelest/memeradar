@@ -27,6 +27,7 @@ memeradar/
 │   ├── search.py                   # Universal Query API + RRF fusion logic
 │   ├── enrich_cognee.py            # Post-ingest knowledge-graph enrichment
 │   ├── translate.py                # Mistral multilingual caption translation
+│   ├── mutation.py                 # Pure spherical-mean / cosine math (no vendor SDK) — KSP 1 Mutation Radar
 │   ├── schemas.py                  # Pydantic V2 contracts (see §2)
 │   └── .env.example
 │
@@ -37,7 +38,8 @@ memeradar/
 ├── scripts/
 │   ├── crawl_reddit.py             # PRAW-based meme harvester
 │   ├── rrf_sweep.py                # CI-grade RRF rank-shift validator
-│   └── translate_captions.py       # Batch multilingual caption backfill
+│   ├── translate_captions.py       # Batch multilingual caption backfill
+│   └── compute_mutation_metrics.py # Decoupled batch step: per-template spherical-mean centroid, drift score, velocity (KSP 1)
 │
 ├── frontend/
 │   ├── package.json
@@ -45,9 +47,12 @@ memeradar/
 │   ├── index.html
 │   └── src/
 │       ├── main.jsx
-│       ├── App.jsx                 # Search bar + grid + weight slider + lineage panel
+│       ├── App.jsx                 # Search bar + grid + weight slider + meme detail panel (hosts Mutation Radar)
 │       ├── App.css
-│       └── api.js                  # Typed fetch wrapper for FastAPI /search
+│       ├── api.js                  # Typed fetch wrapper for /search, /random, /upload, /mutations + mutation-radar payload mappers (KSP 1)
+│       └── components/
+│           ├── MutationRadar.jsx   # KSP 1 Meme Mutation Radar detail panel: velocity badge, drift gauge, evolution timeline, small-sample banner
+│           └── MutationRadar.css   # Mutation Radar panel styling (scoped to .radar-* classes)
 │
 └── data/                           # Local asset mount (not committed)
     ├── images/                     # Scraped meme media
@@ -59,8 +64,9 @@ memeradar/
 | Method | Path | Module | Purpose | Spec ref |
 |---|---|---|---|---|
 | `GET` | `/health` | `backend/main.py` | Liveness probe | [§2.3](#23-fastapi-search-schema) |
-| `GET` | `/search` | `backend/main.py` → `backend/search.py` | RRF-fused multi-vector search | [§2.3](#23-fastapi-search-schema) |
+| `GET` | `/search` | `backend/main.py` → `backend/search.py` | RRF-fused multi-vector search | [§2.3](#23-fastapi-search-schema) |
 | `GET` | `/random` | `backend/main.py` → `backend/search.py` | Random meme sample for the home grid (Qdrant RANDOM sampling) | [§1](#1-repository-file-tree) |
+| `GET` | `/mutations` | `backend/main.py` → `backend/clients.py` | Mutation Radar read-out: pre-computed per-template drift velocity + trending flags from Neo4j (no dense arithmetic on the hot path). Accepts `trending_only`. | [§2.2](#22-qdrant-named-vector-point-mapping) |
 | `GET` | `/static/images/{filename}` | `backend/main.py` (StaticFiles) | Local image mount for UI thumbnails (mounted only if `data/images` exists) | [§1](#1-repository-file-tree) |
 | `GET` | `/assets/{path}` | `backend/main.py` (StaticFiles) | Built SPA assets (mounted only if `frontend/dist` exists) | [§1](#1-repository-file-tree) |
 | `GET` | `/{full_path:path}` | `backend/main.py` (SPA fallback) | Serves `index.html` for client-side routes; registered last so it never shadows `/health`, `/search`, `/static`, `/assets` | [§1](#1-repository-file-tree) |
@@ -117,6 +123,9 @@ class QdrantPointPayload(BaseModel):
     psychological_state: str
     subtext_context: str
     search_dense_explanations: str
+    indexed_at: int | None             # Unix timestamp at ingest; integer-indexed for mutation-radar time windows
+    template_drift_score: float | None # Cosine distance of this point's visual vector from its template centroid (KSP 1)
+    trending_mutation: bool            # Boolean filter flag raised by the mutation-radar batch step (KSP 1)
 
 
 class QdrantPoint(BaseModel):
@@ -134,8 +143,12 @@ Indexes required at collection creation:
 | `subtext_context` | KEYWORD | Facet filter |
 | `source_subreddit` | KEYWORD | Multi-subreddit mode |
 | `upvotes` | INTEGER | Range filter / sort |
+| `indexed_at` | INTEGER | Mutation-radar time windows (KSP 1) |
+| `trending_mutation` | BOOL | Mutation-radar trending filter flag (KSP 1) |
 
-Tested by [TESTS.md TC-VEC-001 / TC-VEC-002](TESTS.md#2-vector-search-fusion-tests).
+`template_drift_score` (FLOAT payload) and `trending_mutation` (BOOL) are written by the decoupled batch step `scripts/compute_mutation_metrics.py`, never on the hot search/ingest path. The matching `:MemeTemplate` Neo4j node carries `centroid_visual` (float array), `historical_centroid_visual` (float array), and `velocity` (float); see [TASKS.md Sprint 5](TASKS.md#sprint-5--meme-mutation-radar) and [implementation-notes.md](implementation-notes.md) for the spherical-mean contract.
+
+Tested by [TESTS.md TC-VEC-001 / TC-VEC-002 / TC-VEC-003](TESTS.md#2-vector-search-fusion-tests).
 
 ### 2.3 FastAPI `/search` Schema
 

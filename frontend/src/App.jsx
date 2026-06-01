@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { searchMemes, randomMemes, uploadCheck, uploadIngest, resolveImageUrl, LANGUAGES, UPLOAD_STRINGS } from './api.js'
+import { searchMemes, randomMemes, uploadCheck, uploadIngest, resolveImageUrl, fetchMutations, buildMutationIndex, toMutationRadarModel, LANGUAGES, UPLOAD_STRINGS } from './api.js'
+import MutationRadar from './components/MutationRadar.jsx'
 import './App.css'
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
   const [active, setActive] = useState(null)
   const [uploadState, setUploadState] = useState(null)
   const [uploadBusy, setUploadBusy] = useState(false)
+  const [mutationIndex, setMutationIndex] = useState(() => buildMutationIndex(null))
   const debounceRef = useRef(null)
   const lastQuery = useRef('')
   const fileInputRef = useRef(null)
@@ -59,6 +61,16 @@ export default function App() {
   }
 
   useEffect(() => { rollRandom() }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchMutations()
+      .then((data) => { if (!cancelled) setMutationIndex(buildMutationIndex(data)) })
+      .catch(() => { if (!cancelled) setMutationIndex(buildMutationIndex(null)) })
+    return () => { cancelled = true }
+  }, [])
+
+  const radarModel = active ? toMutationRadarModel(active, mutationIndex) : null
 
   function onSlider(e) {
     const val = parseFloat(e.target.value)
@@ -188,17 +200,9 @@ export default function App() {
               <p className="core-joke">{active.core_joke}</p>
               <p className="psych"><em>{active.psychological_state}</em></p>
               <p className="subtext">{active.subtext_context}</p>
-              <div className="lineage">
-                <strong>Template:</strong> {active.lineage?.template ?? active.template}
-                {active.lineage?.variants?.length > 0 && (
-                  <>
-                    <br />
-                    <strong>Variants:</strong> {active.lineage.variants.join(', ')}
-                  </>
-                )}
-              </div>
               <a href={active.permalink} target="_blank" rel="noreferrer">source ↗</a>
             </div>
+            {radarModel && <MutationRadar model={radarModel} />}
           </div>
         </div>
       )}

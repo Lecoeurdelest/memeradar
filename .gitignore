@@ -20,3 +20,4 @@ node_modules/
 dist/
 .env
 mrvenv/
+frontend/node_modules/

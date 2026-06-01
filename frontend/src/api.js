@@ -154,3 +154,62 @@ export async function randomMemes({ k = 24, lang = 'en' } = {}) {
   if (!res.ok) throw new Error(`random failed: ${res.status}`)
   return res.json()
 }
+
+export const NULL_LINEAGE_CACHE = { template: null, variants: [] }
+
+export const MUTATION_DEFAULT_MIN_MEMBERS = 5
+
+export async function fetchMutations({ trendingOnly = false } = {}) {
+  const params = new URLSearchParams({ trending_only: String(trendingOnly) })
+  const res = await fetch(`${API}/mutations?${params}`)
+  if (!res.ok) throw new Error(`mutations failed: ${res.status}`)
+  return res.json()
+}
+
+export function buildMutationIndex(response) {
+  const templates = Array.isArray(response?.templates) ? response.templates : []
+  const byTemplate = new Map()
+  for (const entry of templates) {
+    if (entry && typeof entry.template === 'string') byTemplate.set(entry.template, entry)
+  }
+  return {
+    byTemplate,
+    threshold: typeof response?.threshold === 'number' ? response.threshold : null,
+    minMembers: typeof response?.min_members === 'number' ? response.min_members : MUTATION_DEFAULT_MIN_MEMBERS,
+    ok: Array.isArray(response?.templates),
+  }
+}
+
+function normalizeLineageCache(hit) {
+  const raw = hit?.lineage_cache ?? hit?.lineage ?? null
+  return {
+    template: raw?.template ?? hit?.template ?? null,
+    variants: Array.isArray(raw?.variants) ? raw.variants : [],
+  }
+}
+
+export function toMutationRadarModel(hit, index) {
+  const lineageCache = normalizeLineageCache(hit)
+  const minMembers = index?.minMembers ?? MUTATION_DEFAULT_MIN_MEMBERS
+  const telemetry = index?.byTemplate?.get(lineageCache.template) ?? null
+  const memberCount = telemetry && typeof telemetry.member_count === 'number' ? telemetry.member_count : null
+  const velocity = telemetry && typeof telemetry.velocity === 'number' ? telemetry.velocity : null
+  const accumulatingBaseline = telemetry
+    ? Boolean(telemetry.accumulating_baseline) || (memberCount !== null && memberCount < minMembers)
+    : false
+  const trendingFromHit = typeof hit?.trending_mutation === 'boolean' ? hit.trending_mutation : null
+  const trendingFromTemplate = telemetry ? Boolean(telemetry.trending_mutation) : false
+  const templateDriftScore = typeof hit?.template_drift_score === 'number' ? hit.template_drift_score : null
+  return {
+    template: lineageCache.template,
+    variants: lineageCache.variants,
+    templateDriftScore,
+    trendingMutation: trendingFromHit ?? trendingFromTemplate,
+    velocity,
+    memberCount,
+    minMembers,
+    threshold: index?.threshold ?? null,
+    accumulatingBaseline,
+    hasTelemetry: Boolean(telemetry),
+  }
+}

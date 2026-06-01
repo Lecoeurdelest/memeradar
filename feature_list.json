@@ -1,6 +1,6 @@
 {
   "$schema_note": "Source of truth for feature state. Mirrors TASKS.md but machine-readable. Update at end of every session per AGENTS.md.",
-  "updated": "2026-05-29",
+  "updated": "2026-06-01",
   "features": [
     {
       "id": "F-1.1",
@@ -158,6 +158,20 @@
       "dependencies": ["F-4.3"],
       "status": "done",
       "evidence": "Pill buttons in frontend/src/App.jsx"
+    },
+    {
+      "id": "F-5.1",
+      "name": "Meme Mutation Radar Implementation",
+      "sprint": 5,
+      "dependencies": ["F-1.4", "F-2.3"],
+      "status": "done",
+      "tasks": {
+        "T-5.1.1": { "status": "done", "note": "ensure_mutation_indexes + Neo4j centroid props; indexed_at written at ingest" },
+        "T-5.1.2": { "status": "done", "note": "scripts/compute_mutation_metrics.py — bounded-semaphore member update pass" },
+        "T-5.1.3": { "status": "done", "note": "backend/mutation.py spherical_mean/cosine_distance; unit-length verified locally" },
+        "T-5.1.4": { "status": "done", "note": "N<5 forces velocity=0.0, trending_mutation=false, accumulating baseline" }
+      },
+      "evidence": "manual 2026-06-01 — full live end-to-end against remote Qdrant Cloud (memeradar, 106 pts, named vectors visual+irony) + Neo4j Aura (104 Meme / 103 MemeTemplate). (1) compute_mutation_metrics.py completed with 0 errors over 103 templates; (2) GET /mutations HTTP round-trip returned 103 templates with correct schema (member_count/velocity/trending_mutation/accumulating_baseline), trending_only=true -> 0; (3) TC-VEC-003 unit-length centroid verified offline AND live read-back (persisted centroid_visual L2==1.0 to Aura); (4) TC-FAIL-009 small-sample guardrail verified live (default MIN=5 -> all 103 accumulating, velocity 0.0). Computed/trending path (no real template has >=5 members) verified via in-memory real-Qdrant integration (6-member unit centroid; 7-day-aged history -> velocity 0.951 > 0.15 -> trending=True) and a MIN=1 live verification run that persisted real unit-length centroid arrays to Aura + drift_score to cloud Qdrant (read back), then reverted to the MIN=5 default state (0 centroids, 103 accumulating). Discipline grep clean on both new files; import backend.main OK, /mutations route registered. NOTE: actual visual vectors in the live collection are 512-dim (spec CLAUDE.md 2.2 says 1024); mutation math is dimension-agnostic and unaffected. Docker not used (datastores are cloud); backend.ingest skipped (data/images empty -> would no-op-quarantine; collection already populated)."
     },
     {
       "id": "F-X.1",

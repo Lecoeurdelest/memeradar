@@ -47,6 +47,7 @@ if (Test-Path $envFile) {
 }
 
 Write-Host "=== init complete ==="
-Write-Host "Start app:"
-Write-Host "  uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000"
+Write-Host "Start backend (single command):"
+Write-Host "  ./start.ps1                 # uv sync + uvicorn on :8000"
+Write-Host "Optional dev UI:"
 Write-Host "  cd frontend; npm run dev"

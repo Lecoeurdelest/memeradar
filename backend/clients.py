@@ -109,6 +109,81 @@ async def ensure_sha256_index() -> None:
         pass
 
 
+async def ensure_mutation_indexes() -> None:
+    client = get_qdrant()
+    specs = [
+        ("template", models.PayloadSchemaType.KEYWORD),
+        ("indexed_at", models.PayloadSchemaType.INTEGER),
+        ("template_drift_score", models.PayloadSchemaType.FLOAT),
+        ("trending_mutation", models.PayloadSchemaType.BOOL),
+    ]
+    for field_name, field_type in specs:
+        try:
+            await client.create_payload_index(config.QDRANT_COLLECTION, field_name, field_type)
+        except Exception:
+            pass
+
+
+async def qdrant_distinct_templates(batch: int = 256) -> list[str]:
+    client = get_qdrant()
+    seen: set[str] = set()
+    offset = None
+    while True:
+        points, next_offset = await client.scroll(
+            collection_name=config.QDRANT_COLLECTION,
+            limit=batch,
+            offset=offset,
+            with_payload=["template"],
+            with_vectors=False,
+        )
+        for p in points:
+            template = (p.payload or {}).get("template")
+            if template:
+                seen.add(template)
+        if next_offset is None:
+            break
+        offset = next_offset
+    return sorted(seen)
+
+
+async def qdrant_scroll_template_members(template: str, batch: int) -> list[dict]:
+    client = get_qdrant()
+    members: list[dict] = []
+    offset = None
+    template_filter = models.Filter(
+        must=[models.FieldCondition(key="template", match=models.MatchValue(value=template))]
+    )
+    while True:
+        points, next_offset = await client.scroll(
+            collection_name=config.QDRANT_COLLECTION,
+            scroll_filter=template_filter,
+            limit=batch,
+            offset=offset,
+            with_payload=["indexed_at"],
+            with_vectors=["visual"],
+        )
+        for p in points:
+            vectors = p.vector if isinstance(p.vector, dict) else {}
+            members.append({
+                "id": str(p.id),
+                "visual": vectors.get("visual"),
+                "indexed_at": (p.payload or {}).get("indexed_at"),
+            })
+        if next_offset is None:
+            break
+        offset = next_offset
+    return members
+
+
+async def qdrant_set_payload_fields(point_id: str, fields: dict) -> None:
+    client = get_qdrant()
+    await client.set_payload(
+        collection_name=config.QDRANT_COLLECTION,
+        payload=fields,
+        points=[point_id],
+    )
+
+
 async def qdrant_scroll_by_sha256(sha256: str) -> dict | None:
     client = get_qdrant()
     points, _ = await client.scroll(
@@ -360,6 +435,82 @@ async def neo4j_lineage(meme_id: str) -> dict:
         if not record:
             return {"template": None, "variants": []}
         return {"template": record["template"], "variants": record["variants"]}
+
+
+async def neo4j_get_template_centroid(template: str) -> dict | None:
+    driver = get_neo4j_driver()
+    query = (
+        "MATCH (t:MemeTemplate {name: $template}) "
+        "RETURN t.centroid_visual AS centroid_visual, "
+        "       t.historical_centroid_visual AS historical_centroid_visual, "
+        "       t.velocity AS velocity, "
+        "       t.centroid_computed_at AS centroid_computed_at"
+    )
+    async with driver.session() as session:
+        result = await session.run(query, template=template)
+        record = await result.single()
+        if not record:
+            return None
+        return {
+            "centroid_visual": record["centroid_visual"],
+            "historical_centroid_visual": record["historical_centroid_visual"],
+            "velocity": record["velocity"],
+            "centroid_computed_at": record["centroid_computed_at"],
+        }
+
+
+async def neo4j_set_template_centroid(
+    template: str,
+    centroid_visual: list[float] | None,
+    historical_centroid_visual: list[float] | None,
+    velocity: float,
+    computed_at: int,
+    member_count: int,
+) -> None:
+    driver = get_neo4j_driver()
+    query = (
+        "MERGE (t:MemeTemplate {name: $template}) "
+        "ON CREATE SET t.created_at = timestamp() "
+        "SET t.centroid_visual = $centroid_visual, "
+        "    t.historical_centroid_visual = $historical_centroid_visual, "
+        "    t.velocity = $velocity, "
+        "    t.centroid_computed_at = $computed_at, "
+        "    t.member_count = $member_count"
+    )
+    async with driver.session() as session:
+        result = await session.run(
+            query,
+            template=template,
+            centroid_visual=centroid_visual,
+            historical_centroid_visual=historical_centroid_visual,
+            velocity=velocity,
+            computed_at=computed_at,
+            member_count=member_count,
+        )
+        await result.consume()
+
+
+async def neo4j_list_template_metrics() -> list[dict]:
+    driver = get_neo4j_driver()
+    query = (
+        "MATCH (t:MemeTemplate) "
+        "WHERE t.centroid_computed_at IS NOT NULL "
+        "RETURN t.name AS template, "
+        "       coalesce(t.velocity, 0.0) AS velocity, "
+        "       coalesce(t.member_count, 0) AS member_count "
+        "ORDER BY velocity DESC, template ASC"
+    )
+    async with driver.session() as session:
+        result = await session.run(query)
+        records = [r async for r in result]
+        return [
+            {
+                "template": r["template"],
+                "velocity": r["velocity"],
+                "member_count": r["member_count"],
+            }
+            for r in records
+        ]
 
 
 async def scroll_all_payloads() -> list[dict]:
